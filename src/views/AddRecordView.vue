@@ -1,0 +1,778 @@
+<!-- src/views/AddRecordView.vue -->
+<template>
+  <main class="mx-auto max-w-6xl px-4 pb-10 pt-4 sm:pt-6 lg:pt-8">
+    <section class="space-y-6 sm:space-y-8">
+      <!-- Page header -->
+      <header
+        class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+      >
+        <!-- Left -->
+        <div>
+          <RouterLink
+            to="/dashboard"
+            class="inline-flex items-center gap-2 rounded-full bg-white/80 px-3 py-1.5 text-[11px] font-medium text-slate-600 shadow-sm ring-1 ring-slate-200 transition hover:bg-slate-50 hover:text-slate-900"
+          >
+            <span class="text-sm">←</span>
+            <span>Back to dashboard</span>
+          </RouterLink>
+
+          <div class="mt-3 space-y-1.5">
+            <div class="flex flex-wrap items-center gap-2">
+              <h1 class="text-2xl font-semibold text-slate-900 sm:text-3xl">
+                Add health record
+              </h1>
+              <span
+                class="inline-flex items-center gap-1 rounded-full bg-sky-50 px-2.5 py-1 text-[11px] font-medium text-sky-700 ring-1 ring-sky-100"
+              >
+                <span class="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+                Today’s entry
+              </span>
+            </div>
+            <p class="text-sm text-slate-600">
+              Log today’s vitals in a few calm steps. You can leave fields blank
+              if you didn’t measure them.
+            </p>
+          </div>
+        </div>
+
+        <!-- Right -->
+        <div class="flex flex-col items-stretch gap-2 sm:w-64 sm:items-end">
+          <div
+            class="rounded-2xl bg-white/90 px-3 py-2 text-[11px] text-slate-500 shadow-sm ring-1 ring-slate-100"
+          >
+            <p class="font-medium text-slate-700">
+              Last record (demo)
+            </p>
+            <p>Today · 09:24 AM</p>
+          </div>
+          <RouterLink
+            to="/records"
+            class="inline-flex items-center justify-center gap-2 rounded-full border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 shadow-sm transition hover:border-sky-500 hover:text-sky-600"
+          >
+            <span>📋</span>
+            <span>View all records</span>
+          </RouterLink>
+        </div>
+      </header>
+
+      <!-- Main layout -->
+      <div
+        class="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,1.2fr)]"
+      >
+        <!-- Left: form -->
+        <section
+          class="rounded-3xl bg-white/95 p-4 shadow-md ring-1 ring-slate-100 backdrop-blur-sm sm:p-5 lg:p-6"
+        >
+          <!-- Toast -->
+          <div
+            v-if="toast.visible"
+            class="mb-4 rounded-xl border border-emerald-100 bg-emerald-50 px-3 py-2 text-[11px] text-emerald-700"
+          >
+            {{ toast.message }}
+          </div>
+
+          <!-- Stepper -->
+          <div
+            class="mb-5 flex flex-wrap items-center gap-2 rounded-2xl bg-slate-50 px-3 py-2 text-[11px] text-slate-600 ring-1 ring-slate-100"
+          >
+            <div class="inline-flex items-center gap-1.5">
+              <span
+                class="flex h-5 w-5 items-center justify-center rounded-full bg-sky-600 text-[10px] font-semibold text-white"
+              >
+                1
+              </span>
+              <span class="font-medium text-slate-800">
+                Visit details
+              </span>
+            </div>
+            <span class="h-px w-6 bg-slate-200" />
+            <div class="inline-flex items-center gap-1.5">
+              <span
+                class="flex h-5 w-5 items-center justify-center rounded-full bg-slate-200 text-[10px] font-semibold text-slate-700"
+              >
+                2
+              </span>
+              <span>Vitals</span>
+            </div>
+            <span class="h-px w-6 bg-slate-200" />
+            <div class="inline-flex items-center gap-1.5">
+              <span
+                class="flex h-5 w-5 items-center justify-center rounded-full bg-slate-200 text-[10px] font-semibold text-slate-700"
+              >
+                3
+              </span>
+              <span>Symptoms &amp; context</span>
+            </div>
+          </div>
+
+          <form class="space-y-6" @submit.prevent="handleSubmit">
+            <!-- Visit details -->
+            <section class="space-y-4">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <h2
+                    class="text-xs font-semibold uppercase tracking-wide text-slate-500"
+                  >
+                    Visit details
+                  </h2>
+                  <p class="mt-1 text-xs text-slate-500">
+                    When was this reading taken?
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  class="inline-flex items-center gap-1 rounded-full bg-slate-900 px-3 py-1.5 text-[11px] font-medium text-slate-50 shadow-sm hover:bg-slate-800"
+                  @click="setNow"
+                >
+                  <span>Use today &amp; now</span>
+                </button>
+              </div>
+
+              <div class="grid gap-4 sm:grid-cols-2">
+                <!-- Date -->
+                <div>
+                  <label
+                    class="flex items-center gap-1 text-xs font-medium text-slate-700"
+                  >
+                    <span>Date</span>
+                    <span class="text-rose-500">*</span>
+                  </label>
+                  <input
+                    v-model="form.date"
+                    type="date"
+                    class="mt-1.5 w-full rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-900 outline-none ring-sky-100 placeholder:text-slate-400 focus:border-sky-400 focus:bg-white focus:ring-2"
+                  />
+                  <p
+                    v-if="errors.date"
+                    class="mt-1 text-[11px] text-rose-600"
+                  >
+                    {{ errors.date }}
+                  </p>
+                </div>
+
+                <!-- Time -->
+                <div>
+                  <label
+                    class="text-xs font-medium text-slate-700"
+                  >
+                    Time
+                  </label>
+                  <input
+                    v-model="form.time"
+                    type="time"
+                    class="mt-1.5 w-full rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-900 outline-none ring-sky-100 placeholder:text-slate-400 focus:border-sky-400 focus:bg-white focus:ring-2"
+                  />
+                </div>
+              </div>
+
+              <!-- Session -->
+              <div class="mt-2">
+                <label
+                  class="text-xs font-medium text-slate-700"
+                >
+                  Session
+                </label>
+                <select
+                  v-model="form.session"
+                  class="mt-1.5 w-full rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-900 outline-none ring-sky-100 focus:border-sky-400 focus:bg-white focus:ring-2"
+                >
+                  <option value="">Select session (optional)</option>
+                  <option value="Morning">Morning</option>
+                  <option value="Afternoon">Afternoon</option>
+                  <option value="Evening">Evening</option>
+                  <option value="Night">Night</option>
+                </select>
+                <p class="mt-1 text-[11px] text-slate-500">
+                  This can make it easier to see patterns across the day.
+                </p>
+              </div>
+            </section>
+
+            <!-- Vitals -->
+            <section class="space-y-4">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <h2
+                    class="text-xs font-semibold uppercase tracking-wide text-slate-500"
+                  >
+                    Vitals
+                  </h2>
+                  <p class="mt-1 text-xs text-slate-500">
+                    Enter the vitals you measured for this record. Leave blank
+                    if not measured.
+                  </p>
+                </div>
+              </div>
+
+              <p
+                v-if="errors.vitals"
+                class="text-[11px] text-rose-600"
+              >
+                {{ errors.vitals }}
+              </p>
+
+              <!-- Blood pressure -->
+              <div
+                class="rounded-2xl bg-slate-50/80 p-3.5 ring-1 ring-slate-100"
+              >
+                <p
+                  class="text-[11px] font-medium text-slate-600"
+                >
+                  Blood pressure
+                  <span class="text-[10px] text-slate-400">
+                    (mmHg)
+                  </span>
+                </p>
+                <div
+                  class="mt-3 grid gap-3 sm:grid-cols-2"
+                >
+                  <div>
+                    <label
+                      class="text-[11px] text-slate-500"
+                    >
+                      Systolic
+                    </label>
+                    <input
+                      v-model="form.bpSystolic"
+                      type="number"
+                      inputmode="decimal"
+                      placeholder="118"
+                      class="mt-1 w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-900 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-100"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      class="text-[11px] text-slate-500"
+                    >
+                      Diastolic
+                    </label>
+                    <input
+                      v-model="form.bpDiastolic"
+                      type="number"
+                      inputmode="decimal"
+                      placeholder="76"
+                      class="mt-1 w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-900 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-100"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <!-- HR + Temp + Sugar -->
+              <div class="space-y-4">
+                <div class="grid gap-4 sm:grid-cols-2">
+                  <!-- Heart rate -->
+                  <div>
+                    <label
+                      class="text-xs font-medium text-slate-700"
+                    >
+                      Heart rate
+                      <span class="text-[11px] font-normal text-slate-400">
+                        (bpm)
+                      </span>
+                    </label>
+                    <input
+                      v-model="form.heartRate"
+                      type="number"
+                      inputmode="decimal"
+                      placeholder="78"
+                      class="mt-1.5 w-full rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-900 outline-none focus:border-sky-400 focus:bg-white focus:ring-2 focus:ring-sky-100"
+                    />
+                  </div>
+
+                  <!-- Temperature -->
+                  <div>
+                    <label
+                      class="text-xs font-medium text-slate-700"
+                    >
+                      Temperature
+                      <span class="text-[11px] font-normal text-slate-400">
+                        (°C)
+                      </span>
+                    </label>
+                    <input
+                      v-model="form.temperature"
+                      type="number"
+                      inputmode="decimal"
+                      placeholder="36.8"
+                      step="0.1"
+                      class="mt-1.5 w-full rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-900 outline-none focus:border-sky-400 focus:bg-white focus:ring-2 focus:ring-sky-100"
+                    />
+                  </div>
+                </div>
+
+                <!-- Blood sugar -->
+                <div>
+                  <label
+                    class="text-xs font-medium text-slate-700"
+                  >
+                    Blood sugar
+                    <span class="text-[11px] font-normal text-slate-400">
+                      (mg/dL)
+                    </span>
+                  </label>
+                  <input
+                    v-model="form.bloodSugar"
+                    type="number"
+                    inputmode="decimal"
+                    placeholder="95"
+                    class="mt-1.5 w-full rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-900 outline-none focus:border-sky-400 focus:bg-white focus:ring-2 focus:ring-sky-100"
+                  />
+                </div>
+              </div>
+            </section>
+
+            <!-- Symptoms & notes -->
+            <section class="space-y-4">
+              <div>
+                <h2
+                  class="text-xs font-semibold uppercase tracking-wide text-slate-500"
+                >
+                  Symptoms &amp; notes
+                </h2>
+                <p class="mt-1 text-xs text-slate-500">
+                  Capture how you felt at the time of this reading.
+                </p>
+              </div>
+
+              <!-- Symptoms -->
+              <div>
+                <label
+                  class="text-xs font-medium text-slate-700"
+                >
+                  How are you feeling?
+                </label>
+                <textarea
+                  v-model="form.symptoms"
+                  rows="3"
+                  placeholder="E.g. mild headache, felt dizzy standing up, no symptoms…"
+                  class="mt-1.5 w-full rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-900 outline-none ring-sky-100 placeholder:text-slate-400 focus:border-sky-400 focus:bg-white focus:ring-2"
+                ></textarea>
+              </div>
+
+              <!-- Notes -->
+              <div>
+                <label
+                  class="text-xs font-medium text-slate-700"
+                >
+                  Extra notes
+                  <span class="text-[11px] font-normal text-slate-400">
+                    (optional)
+                  </span>
+                </label>
+                <textarea
+                  v-model="form.notes"
+                  rows="3"
+                  placeholder="Anything else you want to remember about this reading."
+                  class="mt-1.5 w-full rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-900 outline-none ring-sky-100 placeholder:text-slate-400 focus:border-sky-400 focus:bg-white focus:ring-2"
+                ></textarea>
+              </div>
+            </section>
+
+            <!-- Flags -->
+            <section class="space-y-3">
+              <div>
+                <h2
+                  class="text-xs font-semibold uppercase tracking-wide text-slate-500"
+                >
+                  Extra context
+                </h2>
+                <p class="mt-1 text-xs text-slate-500">
+                  A few quick flags that can help explain your numbers.
+                </p>
+              </div>
+
+              <div class="space-y-2">
+                <label
+                  class="flex items-center gap-2 text-xs text-slate-700"
+                >
+                  <input
+                    v-model="form.takenMedication"
+                    type="checkbox"
+                    class="h-3.5 w-3.5 rounded border-slate-300 text-sky-600 focus:ring-sky-500"
+                  />
+                  <span>
+                    Taken medication before this reading
+                  </span>
+                </label>
+
+                <label
+                  class="flex items-center gap-2 text-xs text-slate-700"
+                >
+                  <input
+                    v-model="form.fasting"
+                    type="checkbox"
+                    class="h-3.5 w-3.5 rounded border-slate-300 text-sky-600 focus:ring-sky-500"
+                  />
+                  <span>
+                    Fasting at time of check
+                  </span>
+                </label>
+
+                <label
+                  class="flex items-center gap-2 text-xs text-slate-700"
+                >
+                  <input
+                    v-model="form.shareWithClinician"
+                    type="checkbox"
+                    class="h-3.5 w-3.5 rounded border-slate-300 text-sky-600 focus:ring-sky-500"
+                  />
+                  <span>
+                    Share this record with my clinician
+                  </span>
+                </label>
+              </div>
+            </section>
+
+            <!-- Actions & disclaimer -->
+            <section
+              class="flex flex-col gap-3 border-t border-slate-100 pt-4 text-[11px] sm:flex-row sm:items-center sm:justify-between"
+            >
+              <p class="max-w-md text-slate-500">
+                This is not a diagnosis. Always talk to a qualified healthcare
+                professional about your results.
+              </p>
+
+              <div
+                class="flex flex-wrap items-center gap-3 sm:justify-end"
+              >
+                <RouterLink
+                  to="/dashboard"
+                  class="text-xs font-medium text-slate-500 underline-offset-4 hover:text-slate-700 hover:underline"
+                >
+                  Cancel
+                </RouterLink>
+
+                <button
+                  type="submit"
+                  :disabled="isSubmitting"
+                  class="inline-flex items-center justify-center gap-2 rounded-full bg-sky-600 px-5 py-2 text-xs font-semibold text-white shadow-sm shadow-sky-500/30 hover:bg-sky-700 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  <span v-if="!isSubmitting">
+                    Save record
+                  </span>
+                  <span v-else>
+                    Saving…
+                  </span>
+                </button>
+              </div>
+            </section>
+          </form>
+        </section>
+
+        <!-- Right: Preview + tips -->
+        <section class="space-y-4 lg:space-y-5">
+          <!-- Preview / summary -->
+          <article
+            class="rounded-2xl bg-gradient-to-br from-sky-50 via-white to-emerald-50 p-4 shadow-sm ring-1 ring-sky-100 sm:p-5"
+          >
+            <div class="flex items-start justify-between gap-3">
+              <div>
+                <h2 class="text-sm font-semibold text-slate-900">
+                  Preview
+                </h2>
+                <p class="mt-1 text-[11px] text-slate-500">
+                  How this record will look in your dashboard.
+                </p>
+              </div>
+              <span
+                class="inline-flex items-center rounded-full bg-sky-100 px-2 py-0.5 text-[10px] font-medium text-sky-700"
+              >
+                Updates as you type
+              </span>
+            </div>
+
+            <div class="mt-4 space-y-4 text-[11px] text-slate-700">
+              <!-- Date/session line -->
+              <div class="space-y-1">
+                <p class="text-[10px] font-medium uppercase tracking-wide text-slate-500">
+                  When
+                </p>
+                <p>
+                  {{ previewDateLabel }}
+                </p>
+              </div>
+
+              <!-- Vitals chips -->
+              <div class="space-y-1">
+                <p class="text-[10px] font-medium uppercase tracking-wide text-slate-500">
+                  Vitals
+                </p>
+                <div class="flex flex-wrap gap-2">
+                  <span
+                    v-if="hasBp"
+                    class="inline-flex items-center gap-1 rounded-full bg-sky-50 px-2.5 py-1 text-sky-700"
+                  >
+                    <span
+                      class="h-1.5 w-1.5 rounded-full bg-sky-500"
+                    ></span>
+                    <span>
+                      BP:
+                      <span v-if="form.bpSystolic">
+                        {{ form.bpSystolic }}
+                      </span>
+                      <span v-if="form.bpSystolic || form.bpDiastolic">
+                        /
+                      </span>
+                      <span v-if="form.bpDiastolic">
+                        {{ form.bpDiastolic }}
+                      </span>
+                      mmHg
+                    </span>
+                  </span>
+
+                  <span
+                    v-if="form.heartRate"
+                    class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-1 text-emerald-700"
+                  >
+                    <span
+                      class="h-1.5 w-1.5 rounded-full bg-emerald-500"
+                    ></span>
+                    <span>HR: {{ form.heartRate }} bpm</span>
+                  </span>
+
+                  <span
+                    v-if="form.temperature"
+                    class="inline-flex items-center gap-1 rounded-full bg-teal-50 px-2.5 py-1 text-teal-700"
+                  >
+                    <span
+                      class="h-1.5 w-1.5 rounded-full bg-teal-500"
+                    ></span>
+                    <span>Temp: {{ form.temperature }} °C</span>
+                  </span>
+
+                  <span
+                    v-if="form.bloodSugar"
+                    class="inline-flex items-center gap-1 rounded-full bg-indigo-50 px-2.5 py-1 text-indigo-700"
+                  >
+                    <span
+                      class="h-1.5 w-1.5 rounded-full bg-indigo-500"
+                    ></span>
+                    <span>Sugar: {{ form.bloodSugar }} mg/dL</span>
+                  </span>
+
+                  <span
+                    v-if="!hasAnyVitals"
+                    class="text-[11px] text-slate-400"
+                  >
+                    No vitals added yet.
+                  </span>
+                </div>
+              </div>
+
+              <!-- Feeling -->
+              <div class="space-y-1">
+                <p class="text-[10px] font-medium uppercase tracking-wide text-slate-500">
+                  Feeling
+                </p>
+                <p class="text-[11px] text-slate-700">
+                  {{ previewFeeling }}
+                </p>
+              </div>
+
+              <!-- Flags -->
+              <div class="space-y-1">
+                <p class="text-[10px] font-medium uppercase tracking-wide text-slate-500">
+                  Flags
+                </p>
+                <div class="flex flex-wrap gap-2">
+                  <span
+                    v-if="!form.takenMedication && !form.fasting && !form.shareWithClinician"
+                    class="text-[11px] text-slate-400"
+                  >
+                    No extra flags selected.
+                  </span>
+
+                  <span
+                    v-if="form.takenMedication"
+                    class="inline-flex items-center gap-1 rounded-full bg-slate-900 px-2.5 py-1 text-[10px] font-medium text-slate-50"
+                  >
+                    💊 Medication taken
+                  </span>
+                  <span
+                    v-if="form.fasting"
+                    class="inline-flex items-center gap-1 rounded-full bg-slate-900 px-2.5 py-1 text-[10px] font-medium text-slate-50"
+                  >
+                    🌙 Fasting
+                  </span>
+                  <span
+                    v-if="form.shareWithClinician"
+                    class="inline-flex items-center gap-1 rounded-full bg-slate-900 px-2.5 py-1 text-[10px] font-medium text-slate-50"
+                  >
+                    👩‍⚕️ To share with clinician
+                  </span>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- Quick tips -->
+          <article
+            class="rounded-2xl bg-slate-900 p-4 text-xs text-slate-100 shadow-sm sm:p-5"
+          >
+            <h2 class="flex items-center gap-2 text-sm font-semibold">
+              <span>💡</span>
+              <span>Quick tips for better readings</span>
+            </h2>
+            <ul class="mt-3 space-y-2 leading-snug">
+              <li>• Log at roughly the same time each day.</li>
+              <li>
+                • Rest quietly for 5 minutes before measuring your blood
+                pressure or heart rate.
+              </li>
+              <li>
+                • Avoid caffeine, smoking or heavy exercise right before
+                checking vitals.
+              </li>
+              <li>
+                • Bring a summary of your readings to your next appointment so
+                your clinician can see trends.
+              </li>
+            </ul>
+            <div class="mt-3 text-[11px] text-slate-400">
+              Need more guidance?
+              <RouterLink
+                to="/support"
+                class="font-medium text-sky-300 underline-offset-4 hover:text-sky-200 hover:underline"
+              >
+                Visit Support
+              </RouterLink>
+            </div>
+          </article>
+        </section>
+      </div>
+    </section>
+  </main>
+</template>
+
+<script setup>
+import { reactive, ref, computed } from "vue";
+import { RouterLink } from "vue-router";
+
+const form = reactive({
+  date: "",
+  time: "",
+  session: "",
+  bpSystolic: "",
+  bpDiastolic: "",
+  heartRate: "",
+  temperature: "",
+  bloodSugar: "",
+  symptoms: "",
+  notes: "",
+  takenMedication: false,
+  fasting: false,
+  shareWithClinician: false,
+});
+
+const errors = reactive({
+  date: "",
+  vitals: "",
+});
+
+const toast = reactive({
+  visible: false,
+  type: "success",
+  message: "",
+});
+
+const isSubmitting = ref(false);
+
+const hasBp = computed(
+  () => !!form.bpSystolic || !!form.bpDiastolic
+);
+
+const hasAnyVitals = computed(
+  () =>
+    hasBp.value ||
+    !!form.heartRate ||
+    !!form.temperature ||
+    !!form.bloodSugar
+);
+
+const previewDateLabel = computed(() => {
+  const parts = [];
+  if (form.date) parts.push(form.date);
+  if (form.time) parts.push(form.time);
+  if (form.session) parts.push(form.session);
+  if (!parts.length) {
+    return "No date or time selected yet.";
+  }
+  return parts.join(" · ");
+});
+
+const previewFeeling = computed(() => {
+  if (!form.symptoms || !form.symptoms.trim()) {
+    return "No symptoms added yet.";
+  }
+  const firstLine = form.symptoms.split(/\r?\n/)[0].trim();
+  if (firstLine.length > 80) {
+    return firstLine.slice(0, 77) + "…";
+  }
+  return firstLine;
+});
+
+const clearErrors = () => {
+  errors.date = "";
+  errors.vitals = "";
+};
+
+const setNow = () => {
+  const now = new Date();
+  // yyyy-mm-dd
+  form.date = now.toISOString().slice(0, 10);
+  // HH:MM (24h)
+  form.time = now.toTimeString().slice(0, 5);
+};
+
+const handleSubmit = () => {
+  clearErrors();
+  toast.visible = false;
+
+  // Validation
+  if (!form.date) {
+    errors.date = "Please select a date for this record.";
+  }
+  if (!hasAnyVitals.value) {
+    errors.vitals =
+      "Enter at least one vital (blood pressure, heart rate, temperature, or blood sugar).";
+  }
+
+  if (errors.date || errors.vitals) {
+    return;
+  }
+
+  isSubmitting.value = true;
+
+  // Simulate network delay
+  setTimeout(() => {
+    isSubmitting.value = false;
+
+    toast.type = "success";
+    toast.message = "Record saved (demo only).";
+    toast.visible = true;
+
+    // Keep date & session for convenience
+    const savedDate = form.date;
+    const savedSession = form.session;
+
+    form.time = "";
+    form.bpSystolic = "";
+    form.bpDiastolic = "";
+    form.heartRate = "";
+    form.temperature = "";
+    form.bloodSugar = "";
+    form.symptoms = "";
+    form.notes = "";
+    form.takenMedication = false;
+    form.fasting = false;
+    form.shareWithClinician = false;
+    form.date = savedDate;
+    form.session = savedSession;
+
+    // Auto-hide toast
+    setTimeout(() => {
+      toast.visible = false;
+    }, 4000);
+  }, 800);
+};
+</script>
