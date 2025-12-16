@@ -6,35 +6,52 @@ import AddRecordView from "../views/AddRecordView.vue";
 import RecordsView from "../views/RecordsView.vue";
 import AboutView from "../views/AboutView.vue";
 import SupportView from "../views/SupportView.vue";
+
 import LoginView from "../views/auth/LoginView.vue";
 import RegisterView from "../views/auth/RegisterView.vue";
+
+// ✅ NEW (create these two views)
+import ShareView from "../views/ShareView.vue";
+import ProfileView from "../views/ProfileView.vue";
 
 const routes = [
   { path: "/", name: "home", component: HomeView },
 
+  // Auth
   { path: "/login", name: "login", component: LoginView },
 
-  // "Get started" CTA – points to the register page
+  // Keep your CTA route + keep /register
   {
     path: "/get-started",
     name: "get-started",
     component: RegisterView,
-    alias: "/register", // you can keep /register working too
+    alias: "/register",
   },
 
+  // Core app
   { path: "/dashboard", name: "dashboard", component: DashboardView },
 
-  // Add health record page – matches RouterLink to="/add-record"
+  // ✅ Canonical Add route (patient-first IA)
   {
-    path: "/add-record",
-    name: "add-record",
+    path: "/add",
+    name: "add",
     component: AddRecordView,
-    alias: "/records/new", // optional: old path still works
+    // keep old paths working:
+    alias: ["/add-record", "/records/new"],
   },
 
   { path: "/records", name: "records", component: RecordsView },
+
+  // ✅ New sections for MVP tabs
+  { path: "/share", name: "share", component: ShareView },
+  { path: "/profile", name: "profile", component: ProfileView },
+
+  // Existing
   { path: "/about", name: "about", component: AboutView },
   { path: "/support", name: "support", component: SupportView },
+
+  // ✅ 404 fallback
+  { path: "/:pathMatch(.*)*", redirect: "/" },
 ];
 
 const router = createRouter({

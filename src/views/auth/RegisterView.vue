@@ -24,11 +24,7 @@
             <div
               class="flex h-9 w-9 items-center justify-center rounded-2xl bg-sky-50 ring-1 ring-sky-100"
             >
-              <img
-                :src="logoMark"
-                alt="TBG Medflow icon"
-                class="h-6 w-6"
-              />
+              <img :src="logoMark" alt="TBG Medflow icon" class="h-6 w-6" />
             </div>
             <div>
               <div class="flex items-center gap-2">
@@ -53,32 +49,31 @@
           <h1
             class="mt-6 text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl"
           >
-            Create your demo workspace.
+            Create your workspace.
           </h1>
-          <p
-            class="mt-2 text-[11px] leading-relaxed text-slate-600 sm:text-xs"
-          >
-            Set up a simple account so you can log vitals, review your records
-            and practise calm documentation — without touching real hospital
-            systems.
+          <p class="mt-2 text-[11px] leading-relaxed text-slate-600 sm:text-xs">
+            Set up your TBG Medflow account so you can log vitals, review your
+            records and stay organised — whether you&apos;re a patient, student
+            nurse or clinician.
           </p>
 
           <ul class="mt-4 space-y-1.5 text-[11px] text-slate-600">
             <li class="flex items-start gap-2">
               <span class="mt-[3px] h-1.5 w-1.5 rounded-full bg-sky-400" />
-              <span>A demo dashboard with today&apos;s vitals overview.</span>
+              <span>A dashboard with today&apos;s vitals overview.</span>
             </li>
             <li class="flex items-start gap-2">
               <span class="mt-[3px] h-1.5 w-1.5 rounded-full bg-emerald-400" />
               <span>
-                A place to practise recording blood pressure, heart rate,
-                temperature and blood sugar.
+                A place to record blood pressure, heart rate, temperature and
+                blood sugar.
               </span>
             </li>
             <li class="flex items-start gap-2">
               <span class="mt-[3px] h-1.5 w-1.5 rounded-full bg-indigo-400" />
               <span>
-                Support pages built for patients, student nurses and clinicians.
+                Support pages designed for patients, student nurses and
+                clinicians.
               </span>
             </li>
           </ul>
@@ -87,7 +82,9 @@
             class="mt-5 inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-[11px] text-emerald-700 ring-1 ring-emerald-100"
           >
             <span class="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-            <span>Practice mode · No real patient data</span>
+            <span>
+              TBG Medflow supports tracking and training — not emergency care.
+            </span>
           </div>
         </div>
 
@@ -147,8 +144,7 @@
               Sign up for TBG Medflow
             </h2>
             <p class="text-[11px] text-slate-600">
-              Just a few details to get started. This is a demo, not a real
-              hospital login.
+              Just a few details to get started with your Medflow workspace.
             </p>
           </header>
 
@@ -196,7 +192,7 @@
                   <option value="other">Other</option>
                 </select>
                 <p class="mt-1 text-[10px] text-slate-500">
-                  This helps tailor the experience in a full version.
+                  This helps tailor the experience to your role.
                 </p>
               </div>
             </div>
@@ -218,10 +214,7 @@
                 class="mt-0.5 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-[11px] text-slate-800 shadow-sm placeholder:text-slate-400 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
                 placeholder="you@example.com"
               />
-              <p
-                v-if="errors.email"
-                class="mt-1 text-[10px] text-red-500"
-              >
+              <p v-if="errors.email" class="mt-1 text-[10px] text-red-500">
                 {{ errors.email }}
               </p>
             </div>
@@ -267,7 +260,8 @@
                 :class="{
                   'bg-red-50 text-red-600': passwordStrength === 'weak',
                   'bg-amber-50 text-amber-700': passwordStrength === 'medium',
-                  'bg-emerald-50 text-emerald-700': passwordStrength === 'strong',
+                  'bg-emerald-50 text-emerald-700':
+                    passwordStrength === 'strong',
                 }"
               >
                 <span class="font-medium">Password strength:</span>
@@ -311,7 +305,7 @@
               </p>
             </div>
 
-            <!-- Terms / demo acknowledgement -->
+            <!-- Terms / disclaimer -->
             <div class="space-y-1 pt-1">
               <label
                 class="flex items-start gap-2 text-[11px] text-slate-700"
@@ -322,9 +316,9 @@
                   class="mt-0.5 h-3.5 w-3.5 rounded border-slate-300 text-sky-600 focus:ring-sky-500"
                 />
                 <span>
-                  I understand this is a
-                  <span class="font-medium">demo environment</span> and should
-                  not replace emergency medical care or real hospital systems.
+                  I understand that TBG Medflow supports tracking and training
+                  and does not replace emergency medical care or my
+                  facility&apos;s official systems and policies.
                 </span>
               </label>
               <p
@@ -345,15 +339,6 @@
               <span v-else>Creating your workspace…</span>
             </button>
 
-            <!-- Guest / demo shortcut -->
-            <button
-              type="button"
-              @click="continueAsGuest"
-              class="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-full border border-dashed border-slate-300 bg-slate-50 px-4 py-2 text-[11px] font-medium text-slate-700 hover:border-sky-400 hover:bg-white hover:text-sky-700"
-            >
-              <span>Skip for now · Continue as guest (demo)</span>
-            </button>
-
             <!-- Secondary text -->
             <p class="mt-3 text-center text-[11px] text-slate-600">
               Already have an account?
@@ -367,8 +352,8 @@
             </p>
 
             <p class="mt-1 text-center text-[10px] text-slate-500">
-              Please avoid using real patient names, IDs or sensitive
-              information in this demo.
+              Please follow your facility&apos;s privacy and data protection
+              policies when entering health information.
             </p>
           </form>
         </div>
@@ -380,16 +365,17 @@
 <script setup>
 import { reactive, ref, computed } from "vue";
 import { useRouter, RouterLink } from "vue-router";
-// NOTE: RegisterView.vue is in src/views/auth, so we need ../../ to reach src
+
 import logoFull from "../../assets/tbg-medflow-logo-compressed.png";
 import logoMark from "../../assets/tbg-medflow-logo-mark.svg";
+import { apiPost } from "../../utils/apiClient";
 
 const router = useRouter();
 
 const form = reactive({
   fullName: "",
   email: "",
-  role: "patient", // 'patient' | 'student' | 'clinician' | 'other'
+  role: "patient",
   password: "",
   confirmPassword: "",
   acceptTerms: false,
@@ -410,20 +396,17 @@ const showConfirmPassword = ref(false);
 const toast = reactive({
   visible: true,
   type: "info",
-  message:
-    "Create a demo account with any email. Please don’t use real patient identifiers.",
+  message: "Create your account with your email and a password.",
 });
 
 const passwordStrength = computed(() => {
   const value = form.password || "";
   if (!value) return "weak";
-
   let score = 0;
   if (value.length >= 8) score++;
   if (/[A-Z]/.test(value)) score++;
   if (/[0-9]/.test(value)) score++;
   if (/[^A-Za-z0-9]/.test(value)) score++;
-
   if (score >= 3) return "strong";
   if (score >= 2) return "medium";
   return "weak";
@@ -433,9 +416,7 @@ const showToast = (type, message) => {
   toast.visible = true;
   toast.type = type;
   toast.message = message;
-  setTimeout(() => {
-    toast.visible = false;
-  }, 4000);
+  setTimeout(() => (toast.visible = false), 4000);
 };
 
 const validate = () => {
@@ -445,32 +426,18 @@ const validate = () => {
   errors.confirmPassword = "";
   errors.acceptTerms = "";
 
-  if (!form.fullName.trim()) {
-    errors.fullName = "Full name is required.";
-  }
+  if (!form.fullName.trim()) errors.fullName = "Full name is required.";
 
-  if (!form.email) {
-    errors.email = "Email is required.";
-  } else if (!form.email.includes("@")) {
-    errors.email = "Please enter a valid email address.";
-  }
+  if (!form.email) errors.email = "Email is required.";
+  else if (!form.email.includes("@")) errors.email = "Please enter a valid email address.";
 
-  if (!form.password) {
-    errors.password = "Password is required.";
-  } else if (form.password.length < 6) {
-    errors.password = "Password should be at least 6 characters.";
-  }
+  if (!form.password) errors.password = "Password is required.";
+  else if (form.password.length < 6) errors.password = "Password should be at least 6 characters.";
 
-  if (!form.confirmPassword) {
-    errors.confirmPassword = "Please confirm your password.";
-  } else if (form.confirmPassword !== form.password) {
-    errors.confirmPassword = "Passwords do not match.";
-  }
+  if (!form.confirmPassword) errors.confirmPassword = "Please confirm your password.";
+  else if (form.confirmPassword !== form.password) errors.confirmPassword = "Passwords do not match.";
 
-  if (!form.acceptTerms) {
-    errors.acceptTerms =
-      "Please confirm you understand the demo disclaimer.";
-  }
+  if (!form.acceptTerms) errors.acceptTerms = "Please confirm the disclaimer before continuing.";
 
   return (
     !errors.fullName &&
@@ -481,30 +448,30 @@ const validate = () => {
   );
 };
 
-const handleSubmit = () => {
+const handleSubmit = async () => {
   if (!validate()) {
     showToast("error", "Please fix the highlighted fields and try again.");
     return;
   }
 
   isSubmitting.value = true;
-  showToast("info", "Creating your demo workspace…");
+  showToast("info", "Creating your account…");
 
-  // Simulate async signup
-  setTimeout(() => {
+  try {
+    await apiPost("register.php", {
+      fullName: form.fullName,
+      email: form.email,
+      password: form.password,
+      role: form.role,
+    });
+
+    showToast("success", "Account created. Redirecting to login…");
+    router.push("/login");
+  } catch (e) {
+    showToast("error", e?.message || "Registration failed. Please try again.");
+  } finally {
     isSubmitting.value = false;
-    showToast(
-      "success",
-      "Account created (demo). Redirecting to your dashboard…",
-    );
-
-    // In a real app you would persist tokens/session here
-    router.push("/dashboard");
-  }, 1000);
-};
-
-const continueAsGuest = () => {
-  showToast("info", "Continuing as guest (demo only)...");
-  router.push("/dashboard");
+  }
 };
 </script>
+
