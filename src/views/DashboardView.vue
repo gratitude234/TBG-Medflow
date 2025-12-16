@@ -6,23 +6,38 @@
       <div class="space-y-2">
         <div class="flex flex-wrap items-center gap-2">
           <h1 class="text-xl font-semibold text-slate-900 sm:text-2xl">Dashboard</h1>
-          <span class="inline-flex items-center gap-1 rounded-full bg-sky-50 px-2.5 py-1 text-[11px] font-medium text-sky-700 ring-1 ring-sky-100">
+          <span
+            class="inline-flex items-center gap-1 rounded-full bg-sky-50 px-2.5 py-1 text-[11px] font-medium text-sky-700 ring-1 ring-sky-100"
+          >
             <span class="h-1.5 w-1.5 rounded-full bg-emerald-500" />
             Today&apos;s overview
           </span>
         </div>
-        <p class="text-sm text-slate-600">Track your vitals and review your recent health records at a glance.</p>
+        <p class="text-sm text-slate-600">
+          Track your vitals and review your recent health records at a glance.
+        </p>
       </div>
 
       <div class="flex flex-col items-start gap-2 text-left sm:items-end sm:text-right">
         <p class="text-[11px] text-slate-400">{{ lastRecordLabel }}</p>
-        <RouterLink
-          to="/add-record"
-          class="inline-flex items-center gap-2 rounded-full bg-sky-600 px-4 py-2 text-xs font-semibold text-white shadow-md shadow-sky-500/25 transition hover:bg-sky-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-50"
-        >
-          <span aria-hidden="true" class="flex h-4 w-4 items-center justify-center rounded-full bg-sky-500 text-[11px]">＋</span>
-          Add health record
-        </RouterLink>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <RouterLink
+            to="/add"
+            class="inline-flex items-center gap-2 rounded-full bg-sky-600 px-4 py-2 text-xs font-semibold text-white shadow-md shadow-sky-500/25 transition hover:bg-sky-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-50"
+          >
+            <span aria-hidden="true" class="flex h-4 w-4 items-center justify-center rounded-full bg-sky-500 text-[11px]">＋</span>
+            Add vitals
+          </RouterLink>
+
+          <RouterLink
+            to="/share"
+            class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-700 shadow-sm transition hover:border-sky-500 hover:text-sky-700"
+          >
+            <span aria-hidden="true">📤</span>
+            Share summary
+          </RouterLink>
+        </div>
       </div>
     </section>
 
@@ -86,6 +101,7 @@
               <h2 class="text-sm font-semibold text-slate-900">Recent records</h2>
               <p class="mt-1 text-xs text-slate-500">Your last few logged vitals.</p>
             </div>
+
             <RouterLink
               to="/records"
               class="text-[11px] font-medium text-sky-600 underline-offset-4 hover:text-sky-700 hover:underline"
@@ -99,12 +115,12 @@
           </div>
 
           <div v-else-if="!hasRecords" class="mt-4 rounded-xl bg-slate-50 px-4 py-6 text-center text-xs text-slate-500">
-            <p>You haven&apos;t logged any health records yet.</p>
+            <p>You haven&apos;t logged any vitals yet.</p>
             <RouterLink
-              to="/add-record"
+              to="/add"
               class="mt-3 inline-flex items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-[11px] font-semibold text-white shadow-sm transition hover:bg-slate-800"
             >
-              Add your first record
+              Add your first vitals
             </RouterLink>
           </div>
 
@@ -167,10 +183,12 @@
 
           <div class="mt-4 space-y-2">
             <RouterLink
-              to="/add-record"
+              to="/add"
               class="inline-flex w-full items-center justify-between rounded-2xl bg-sky-600 px-4 py-2.5 text-xs font-semibold text-white shadow-sm transition hover:bg-sky-700"
             >
-              <span class="inline-flex items-center gap-2"><span aria-hidden="true">🩺</span> Add health record</span>
+              <span class="inline-flex items-center gap-2">
+                <span aria-hidden="true">🩺</span> Add vitals
+              </span>
               <span aria-hidden="true">↗</span>
             </RouterLink>
 
@@ -178,9 +196,33 @@
               to="/records"
               class="inline-flex w-full items-center justify-between rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-medium text-slate-700 shadow-sm transition hover:border-sky-500 hover:text-sky-600"
             >
-              <span class="inline-flex items-center gap-2"><span aria-hidden="true">📋</span> View all records</span>
+              <span class="inline-flex items-center gap-2">
+                <span aria-hidden="true">📋</span> View all records
+              </span>
               <span aria-hidden="true">↗</span>
             </RouterLink>
+
+            <RouterLink
+              to="/share"
+              class="inline-flex w-full items-center justify-between rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-medium text-slate-700 shadow-sm transition hover:border-sky-500 hover:text-sky-600"
+            >
+              <span class="inline-flex items-center gap-2">
+                <span aria-hidden="true">📤</span> Share a summary
+              </span>
+              <span aria-hidden="true">↗</span>
+            </RouterLink>
+
+            <button
+              type="button"
+              class="inline-flex w-full items-center justify-between rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-medium text-slate-700 shadow-sm transition hover:border-sky-500 hover:text-sky-600 disabled:opacity-60"
+              :disabled="isLoading"
+              @click="fetchDashboard"
+            >
+              <span class="inline-flex items-center gap-2">
+                <span aria-hidden="true">🔄</span> Refresh dashboard
+              </span>
+              <span aria-hidden="true">↗</span>
+            </button>
           </div>
         </section>
       </div>
@@ -189,21 +231,22 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { RouterLink, useRouter } from "vue-router";
 
-// ✅ FIXED import path (was "./utils/apiClient") :contentReference[oaicite:5]{index=5}
+// Uses your existing utilities (so we don't break existing API usage)
 import { fetchUserRecords, getLoggedInUser } from "../utils/records";
 
 const router = useRouter();
 
-const loading = ref(false);
-const error = ref("");
+const isLoading = ref(false);
+const errorMessage = ref("");
 const records = ref([]);
 
+// ---- Fetch ----
 const fetchDashboard = async () => {
-  loading.value = true;
-  error.value = "";
+  isLoading.value = true;
+  errorMessage.value = "";
 
   try {
     const user = getLoggedInUser();
@@ -212,36 +255,83 @@ const fetchDashboard = async () => {
       return;
     }
 
-    records.value = await fetchUserRecords(user.id);
+    const list = await fetchUserRecords(user.id);
+    records.value = Array.isArray(list) ? list : [];
   } catch (e) {
-    error.value = e?.message || "Failed to load dashboard records.";
+    errorMessage.value = e?.message || "Failed to load dashboard records.";
   } finally {
-    loading.value = false;
+    isLoading.value = false;
   }
 };
 
-const latest = computed(() => records.value[0] || null);
+// ---- Derived ----
+const latest = computed(() => (records.value.length ? records.value[0] : null));
+const hasRecords = computed(() => records.value.length > 0);
 
-const todaysSummary = computed(() => {
+const lastRecordLabel = computed(() => {
   const r = latest.value;
-  if (!r) return null;
+  if (!r) return "No records yet";
+  const date = r.displayDate || r.date || "—";
+  const time = r.time || "—";
+  return `Last record: ${date} • ${time}`;
+});
 
-  const bp = r.bpSystolic && r.bpDiastolic ? `${r.bpSystolic}/${r.bpDiastolic}` : "—";
-  const hr = r.heartRate ? `${r.heartRate}` : "—";
-  const temp = r.temperature != null ? `${r.temperature}` : "—";
-  const sugar = r.bloodSugar ? `${r.bloodSugar}` : "—";
+const todayVitals = computed(() => {
+  const r = latest.value;
 
-  return { bp, hr, temp, sugar, date: r.displayDate, time: r.time };
+  const bpVal = r?.bpSystolic && r?.bpDiastolic ? `${r.bpSystolic}/${r.bpDiastolic}` : "—";
+  const hrVal = r?.heartRate ? `${r.heartRate}` : "—";
+  const tempVal = r?.temperature != null && r?.temperature !== "" ? `${r.temperature}` : "—";
+  const sugarVal = r?.bloodSugar ? `${r.bloodSugar}` : "—";
+
+  return [
+    {
+      key: "bp",
+      icon: "🩺",
+      label: "Blood pressure",
+      value: bpVal,
+      status: bpVal === "—" ? "Missing" : "Logged",
+      helper: "mmHg",
+      accent: bpVal === "—" ? "bg-slate-200" : "bg-sky-500",
+    },
+    {
+      key: "hr",
+      icon: "❤️",
+      label: "Heart rate",
+      value: hrVal,
+      status: hrVal === "—" ? "Missing" : "Logged",
+      helper: "bpm",
+      accent: hrVal === "—" ? "bg-slate-200" : "bg-rose-500",
+    },
+    {
+      key: "temp",
+      icon: "🌡️",
+      label: "Temperature",
+      value: tempVal,
+      status: tempVal === "—" ? "Missing" : "Logged",
+      helper: "°C",
+      accent: tempVal === "—" ? "bg-slate-200" : "bg-amber-500",
+    },
+    {
+      key: "sugar",
+      icon: "🧪",
+      label: "Blood sugar",
+      value: sugarVal,
+      status: sugarVal === "—" ? "Missing" : "Logged",
+      helper: "mg/dL",
+      accent: sugarVal === "—" ? "bg-slate-200" : "bg-indigo-500",
+    },
+  ];
 });
 
 const recentRecords = computed(() => {
   return records.value.slice(0, 6).map((r) => ({
     id: r.id,
-    date: r.displayDate,
-    time: r.time,
+    date: r.displayDate || r.date || "—",
+    time: r.time || "—",
     bp: r.bpSystolic && r.bpDiastolic ? `${r.bpSystolic}/${r.bpDiastolic}` : "—",
     hr: r.heartRate ? `${r.heartRate}` : "—",
-    temp: r.temperature != null ? `${r.temperature}` : "—",
+    temp: r.temperature != null && r.temperature !== "" ? `${r.temperature}` : "—",
     sugar: r.bloodSugar ? `${r.bloodSugar}` : "—",
   }));
 });

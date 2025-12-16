@@ -19,42 +19,26 @@
             <span>Back to login</span>
           </RouterLink>
 
-          <!-- Logo + label -->
           <div class="mt-5 flex items-center gap-3">
-            <div
-              class="flex h-9 w-9 items-center justify-center rounded-2xl bg-sky-50 ring-1 ring-sky-100"
-            >
+            <div class="flex h-9 w-9 items-center justify-center rounded-2xl bg-sky-50 ring-1 ring-sky-100">
               <img :src="logoMark" alt="TBG Medflow icon" class="h-6 w-6" />
             </div>
             <div>
               <div class="flex items-center gap-2">
-                <img
-                  :src="logoFull"
-                  alt="TBG Medflow logo"
-                  class="h-6 w-auto sm:h-7"
-                />
-                <span
-                  class="hidden text-xs font-semibold tracking-tight text-slate-900 sm:inline-block"
-                >
+                <img :src="logoFull" alt="TBG Medflow logo" class="h-6 w-auto sm:h-7" />
+                <span class="hidden text-xs font-semibold tracking-tight text-slate-900 sm:inline-block">
                   TBG Medflow
                 </span>
               </div>
-              <p class="mt-1 text-[10px] text-slate-500">
-                Smart health record tracker
-              </p>
+              <p class="mt-1 text-[10px] text-slate-500">Smart health record tracker</p>
             </div>
           </div>
 
-          <!-- Copy -->
-          <h1
-            class="mt-6 text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl"
-          >
+          <h1 class="mt-6 text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">
             Create your workspace.
           </h1>
           <p class="mt-2 text-[11px] leading-relaxed text-slate-600 sm:text-xs">
-            Set up your TBG Medflow account so you can log vitals, review your
-            records and stay organised — whether you&apos;re a patient, student
-            nurse or clinician.
+            Set up your TBG Medflow account so you can log vitals, review your records and stay organised.
           </p>
 
           <ul class="mt-4 space-y-1.5 text-[11px] text-slate-600">
@@ -64,102 +48,58 @@
             </li>
             <li class="flex items-start gap-2">
               <span class="mt-[3px] h-1.5 w-1.5 rounded-full bg-emerald-400" />
-              <span>
-                A place to record blood pressure, heart rate, temperature and
-                blood sugar.
-              </span>
+              <span>A place to record BP, heart rate, temperature and blood sugar.</span>
             </li>
             <li class="flex items-start gap-2">
               <span class="mt-[3px] h-1.5 w-1.5 rounded-full bg-indigo-400" />
-              <span>
-                Support pages designed for patients, student nurses and
-                clinicians.
-              </span>
+              <span>Share summaries for clinician/mentor review.</span>
             </li>
           </ul>
 
-          <div
-            class="mt-5 inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-[11px] text-emerald-700 ring-1 ring-emerald-100"
-          >
+          <div class="mt-5 inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-[11px] text-emerald-700 ring-1 ring-emerald-100">
             <span class="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-            <span>
-              TBG Medflow supports tracking and training — not emergency care.
-            </span>
+            <span>TBG Medflow supports tracking and training — not emergency care.</span>
           </div>
         </div>
 
         <p class="mt-6 text-[11px] text-slate-500">
-          Curious about how it works? Read more on the
-          <RouterLink
-            to="/about"
-            class="font-medium text-sky-700 hover:text-sky-800"
-          >
-            About
-          </RouterLink>
-          page or visit
-          <RouterLink
-            to="/support"
-            class="font-medium text-sky-700 hover:text-sky-800"
-          >
-            Support &amp; help
-          </RouterLink>
-          .
+          Curious about how it works? Visit
+          <RouterLink to="/about" class="font-medium text-sky-700 hover:text-sky-800">About</RouterLink>
+          or
+          <RouterLink to="/support" class="font-medium text-sky-700 hover:text-sky-800">Support</RouterLink>.
         </p>
       </section>
 
       <!-- Right: register form -->
       <section class="pt-2 lg:pt-0">
-        <div
-          class="rounded-2xl bg-slate-50/90 p-4 shadow-inner ring-1 ring-slate-100 sm:p-5 lg:p-6"
-        >
+        <div class="rounded-2xl bg-slate-50/90 p-4 shadow-inner ring-1 ring-slate-100 sm:p-5 lg:p-6">
           <!-- Toast -->
           <div
             v-if="toast.visible"
             class="mb-3 flex items-start gap-2 rounded-xl px-3 py-2 text-[11px]"
             :class="{
-              'bg-sky-50 text-sky-800 ring-1 ring-sky-100':
-                toast.type === 'info',
-              'bg-emerald-50 text-emerald-800 ring-1 ring-emerald-100':
-                toast.type === 'success',
-              'bg-red-50 text-red-800 ring-1 ring-red-100':
-                toast.type === 'error',
+              'bg-sky-50 text-sky-800 ring-1 ring-sky-100': toast.type === 'info',
+              'bg-emerald-50 text-emerald-800 ring-1 ring-emerald-100': toast.type === 'success',
+              'bg-red-50 text-red-800 ring-1 ring-red-100': toast.type === 'error',
             }"
           >
             <span v-if="toast.type === 'info'">💬</span>
             <span v-else-if="toast.type === 'success'">✅</span>
             <span v-else>⚠️</span>
-            <p class="leading-snug">
-              {{ toast.message }}
-            </p>
+            <p class="leading-snug">{{ toast.message }}</p>
           </div>
 
-          <!-- Heading -->
           <header class="space-y-1.5">
-            <p
-              class="text-[11px] font-medium uppercase tracking-wide text-slate-500"
-            >
-              Create your account
-            </p>
-            <h2 class="text-lg font-semibold text-slate-900">
-              Sign up for TBG Medflow
-            </h2>
-            <p class="text-[11px] text-slate-600">
-              Just a few details to get started with your Medflow workspace.
-            </p>
+            <p class="text-[11px] font-medium uppercase tracking-wide text-slate-500">Create your account</p>
+            <h2 class="text-lg font-semibold text-slate-900">Sign up for TBG Medflow</h2>
+            <p class="text-[11px] text-slate-600">Just a few details to get started.</p>
           </header>
 
-          <!-- Form -->
           <form class="mt-4 space-y-4" @submit.prevent="handleSubmit">
-            <!-- Full name + role -->
             <div class="grid gap-3 sm:grid-cols-2">
-              <!-- Full name -->
               <div class="space-y-1">
-                <label
-                  for="fullName"
-                  class="text-[11px] font-medium text-slate-700"
-                >
-                  Full name
-                  <span class="text-red-500">*</span>
+                <label for="fullName" class="text-[11px] font-medium text-slate-700">
+                  Full name <span class="text-red-500">*</span>
                 </label>
                 <input
                   id="fullName"
@@ -169,19 +109,11 @@
                   class="mt-0.5 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-[11px] text-slate-800 shadow-sm placeholder:text-slate-400 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
                   placeholder="E.g. Adeola B. Thomas"
                 />
-                <p
-                  v-if="errors.fullName"
-                  class="mt-1 text-[10px] text-red-500"
-                >
-                  {{ errors.fullName }}
-                </p>
+                <p v-if="errors.fullName" class="mt-1 text-[10px] text-red-500">{{ errors.fullName }}</p>
               </div>
 
-              <!-- Role -->
               <div class="space-y-1">
-                <label class="text-[11px] font-medium text-slate-700">
-                  I&apos;m signing up as
-                </label>
+                <label class="text-[11px] font-medium text-slate-700">I&apos;m signing up as</label>
                 <select
                   v-model="form.role"
                   class="mt-0.5 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-[11px] text-slate-800 shadow-sm focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
@@ -191,20 +123,13 @@
                   <option value="clinician">Clinician / mentor</option>
                   <option value="other">Other</option>
                 </select>
-                <p class="mt-1 text-[10px] text-slate-500">
-                  This helps tailor the experience to your role.
-                </p>
+                <p class="mt-1 text-[10px] text-slate-500">This helps tailor the experience to your role.</p>
               </div>
             </div>
 
-            <!-- Email -->
             <div class="space-y-1">
-              <label
-                for="email"
-                class="text-[11px] font-medium text-slate-700"
-              >
-                Email address
-                <span class="text-red-500">*</span>
+              <label for="email" class="text-[11px] font-medium text-slate-700">
+                Email address <span class="text-red-500">*</span>
               </label>
               <input
                 id="email"
@@ -214,19 +139,12 @@
                 class="mt-0.5 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-[11px] text-slate-800 shadow-sm placeholder:text-slate-400 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
                 placeholder="you@example.com"
               />
-              <p v-if="errors.email" class="mt-1 text-[10px] text-red-500">
-                {{ errors.email }}
-              </p>
+              <p v-if="errors.email" class="mt-1 text-[10px] text-red-500">{{ errors.email }}</p>
             </div>
 
-            <!-- Password -->
             <div class="space-y-1">
-              <label
-                for="password"
-                class="text-[11px] font-medium text-slate-700"
-              >
-                Password
-                <span class="text-red-500">*</span>
+              <label for="password" class="text-[11px] font-medium text-slate-700">
+                Password <span class="text-red-500">*</span>
               </label>
               <div
                 class="mt-0.5 flex items-center rounded-xl border border-slate-200 bg-white px-3 shadow-sm focus-within:border-sky-500 focus-within:ring-1 focus-within:ring-sky-500"
@@ -247,21 +165,14 @@
                   {{ showPassword ? "Hide" : "Show" }}
                 </button>
               </div>
-              <p
-                v-if="errors.password"
-                class="mt-1 text-[10px] text-red-500"
-              >
-                {{ errors.password }}
-              </p>
+              <p v-if="errors.password" class="mt-1 text-[10px] text-red-500">{{ errors.password }}</p>
 
-              <!-- Password strength -->
               <p
                 class="mt-1 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px]"
                 :class="{
                   'bg-red-50 text-red-600': passwordStrength === 'weak',
                   'bg-amber-50 text-amber-700': passwordStrength === 'medium',
-                  'bg-emerald-50 text-emerald-700':
-                    passwordStrength === 'strong',
+                  'bg-emerald-50 text-emerald-700': passwordStrength === 'strong',
                 }"
               >
                 <span class="font-medium">Password strength:</span>
@@ -269,14 +180,9 @@
               </p>
             </div>
 
-            <!-- Confirm password -->
             <div class="space-y-1">
-              <label
-                for="confirmPassword"
-                class="text-[11px] font-medium text-slate-700"
-              >
-                Confirm password
-                <span class="text-red-500">*</span>
+              <label for="confirmPassword" class="text-[11px] font-medium text-slate-700">
+                Confirm password <span class="text-red-500">*</span>
               </label>
               <div
                 class="mt-0.5 flex items-center rounded-xl border border-slate-200 bg-white px-3 shadow-sm focus-within:border-sky-500 focus-within:ring-1 focus-within:ring-sky-500"
@@ -297,39 +203,26 @@
                   {{ showConfirmPassword ? "Hide" : "Show" }}
                 </button>
               </div>
-              <p
-                v-if="errors.confirmPassword"
-                class="mt-1 text-[10px] text-red-500"
-              >
+              <p v-if="errors.confirmPassword" class="mt-1 text-[10px] text-red-500">
                 {{ errors.confirmPassword }}
               </p>
             </div>
 
-            <!-- Terms / disclaimer -->
             <div class="space-y-1 pt-1">
-              <label
-                class="flex items-start gap-2 text-[11px] text-slate-700"
-              >
+              <label class="flex items-start gap-2 text-[11px] text-slate-700">
                 <input
                   v-model="form.acceptTerms"
                   type="checkbox"
                   class="mt-0.5 h-3.5 w-3.5 rounded border-slate-300 text-sky-600 focus:ring-sky-500"
                 />
                 <span>
-                  I understand that TBG Medflow supports tracking and training
-                  and does not replace emergency medical care or my
-                  facility&apos;s official systems and policies.
+                  I understand that TBG Medflow supports tracking and training and does not replace emergency
+                  medical care or my facility&apos;s official systems and policies.
                 </span>
               </label>
-              <p
-                v-if="errors.acceptTerms"
-                class="mt-1 text-[10px] text-red-500"
-              >
-                {{ errors.acceptTerms }}
-              </p>
+              <p v-if="errors.acceptTerms" class="mt-1 text-[10px] text-red-500">{{ errors.acceptTerms }}</p>
             </div>
 
-            <!-- Submit -->
             <button
               type="submit"
               :disabled="isSubmitting"
@@ -339,21 +232,13 @@
               <span v-else>Creating your workspace…</span>
             </button>
 
-            <!-- Secondary text -->
             <p class="mt-3 text-center text-[11px] text-slate-600">
               Already have an account?
-              <RouterLink
-                to="/login"
-                class="font-medium text-sky-700 hover:text-sky-800"
-              >
-                Log in
-              </RouterLink>
-              .
+              <RouterLink to="/login" class="font-medium text-sky-700 hover:text-sky-800">Log in</RouterLink>.
             </p>
 
             <p class="mt-1 text-center text-[10px] text-slate-500">
-              Please follow your facility&apos;s privacy and data protection
-              policies when entering health information.
+              Please follow your facility&apos;s privacy and data protection policies when entering health information.
             </p>
           </form>
         </div>
@@ -368,7 +253,9 @@ import { useRouter, RouterLink } from "vue-router";
 
 import logoFull from "../../assets/tbg-medflow-logo-compressed.png";
 import logoMark from "../../assets/tbg-medflow-logo-mark.svg";
+
 import { apiPost } from "../../utils/apiClient";
+import { setSessionUser } from "../../utils/session";
 
 const router = useRouter();
 
@@ -416,7 +303,7 @@ const showToast = (type, message) => {
   toast.visible = true;
   toast.type = type;
   toast.message = message;
-  setTimeout(() => (toast.visible = false), 4000);
+  setTimeout(() => (toast.visible = false), 3500);
 };
 
 const validate = () => {
@@ -439,13 +326,7 @@ const validate = () => {
 
   if (!form.acceptTerms) errors.acceptTerms = "Please confirm the disclaimer before continuing.";
 
-  return (
-    !errors.fullName &&
-    !errors.email &&
-    !errors.password &&
-    !errors.confirmPassword &&
-    !errors.acceptTerms
-  );
+  return !errors.fullName && !errors.email && !errors.password && !errors.confirmPassword && !errors.acceptTerms;
 };
 
 const handleSubmit = async () => {
@@ -458,15 +339,24 @@ const handleSubmit = async () => {
   showToast("info", "Creating your account…");
 
   try {
-    await apiPost("register.php", {
+    const data = await apiPost("register.php", {
       fullName: form.fullName,
       email: form.email,
       password: form.password,
       role: form.role,
     });
 
+    // ✅ Auto-login after register (best MVP flow)
+    if (data?.user?.id) {
+      setSessionUser(data.user);
+      showToast("success", "Account created. Opening your dashboard…");
+      router.replace("/dashboard");
+      return;
+    }
+
+    // If backend doesn’t return user for some reason, fallback to login
     showToast("success", "Account created. Redirecting to login…");
-    router.push("/login");
+    router.replace("/login");
   } catch (e) {
     showToast("error", e?.message || "Registration failed. Please try again.");
   } finally {
@@ -474,4 +364,3 @@ const handleSubmit = async () => {
   }
 };
 </script>
-

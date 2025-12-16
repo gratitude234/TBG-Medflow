@@ -1,7 +1,8 @@
 // src/utils/session.js
+// Single source of truth for auth/session storage
 
 const USER_KEY = "medflowUser";
-const TOKEN_KEY = "medflowToken";
+const TOKEN_KEY = "medflowToken"; // optional (your backend currently returns a demo token)
 
 export function getSessionUser() {
   try {
@@ -12,24 +13,42 @@ export function getSessionUser() {
   }
 }
 
-export function getSessionToken() {
-  return localStorage.getItem(TOKEN_KEY) || "";
+export function setSessionUser(user) {
+  try {
+    if (!user) return;
+    localStorage.setItem(USER_KEY, JSON.stringify(user));
+  } catch {
+    // ignore
+  }
 }
 
-export function setSession({ user, token }) {
-  if (user) localStorage.setItem(USER_KEY, JSON.stringify(user));
-  if (token) localStorage.setItem(TOKEN_KEY, token);
-  notifySessionChanged();
+export function setSessionToken(token) {
+  try {
+    if (!token) return;
+    localStorage.setItem(TOKEN_KEY, String(token));
+  } catch {
+    // ignore
+  }
+}
+
+export function getSessionToken() {
+  try {
+    return localStorage.getItem(TOKEN_KEY) || "";
+  } catch {
+    return "";
+  }
 }
 
 export function clearSession() {
-  localStorage.removeItem(USER_KEY);
-  localStorage.removeItem(TOKEN_KEY);
-  localStorage.removeItem("medflowRememberMe");
-  notifySessionChanged();
+  try {
+    localStorage.removeItem(USER_KEY);
+    localStorage.removeItem(TOKEN_KEY);
+  } catch {
+    // ignore
+  }
 }
 
-export function notifySessionChanged() {
-  // lets App.vue react immediately (without reload)
-  window.dispatchEvent(new Event("medflow:session"));
+export function isLoggedIn() {
+  const u = getSessionUser();
+  return !!u?.id;
 }

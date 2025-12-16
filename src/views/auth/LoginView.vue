@@ -21,43 +21,28 @@
 
           <!-- Logo + label -->
           <div class="mt-5 flex items-center gap-3">
-            <div
-              class="flex h-9 w-9 items-center justify-center rounded-2xl bg-sky-50 ring-1 ring-sky-100"
-            >
+            <div class="flex h-9 w-9 items-center justify-center rounded-2xl bg-sky-50 ring-1 ring-sky-100">
               <img :src="logoMark" alt="TBG Medflow icon" class="h-6 w-6" />
             </div>
             <div>
               <div class="flex items-center gap-2">
-                <img
-                  :src="logoFull"
-                  alt="TBG Medflow logo"
-                  class="h-6 w-auto sm:h-7"
-                />
-                <span
-                  class="hidden text-xs font-semibold tracking-tight text-slate-900 sm:inline-block"
-                >
+                <img :src="logoFull" alt="TBG Medflow logo" class="h-6 w-auto sm:h-7" />
+                <span class="hidden text-xs font-semibold tracking-tight text-slate-900 sm:inline-block">
                   TBG Medflow
                 </span>
               </div>
-              <p class="mt-1 text-[10px] text-slate-500">
-                Smart health record tracker
-              </p>
+              <p class="mt-1 text-[10px] text-slate-500">Smart health record tracker</p>
             </div>
           </div>
 
-          <!-- Hero text -->
-          <h1
-            class="mt-6 text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl"
-          >
+          <h1 class="mt-6 text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">
             Welcome back.
           </h1>
           <p class="mt-2 text-[11px] leading-relaxed text-slate-600 sm:text-xs">
-            Log in to view your dashboard, review recent health records and keep
-            practising calm documentation — whether you&apos;re a patient,
-            student nurse or clinician.
+            Log in to view your dashboard, review recent health records and keep practising calm
+            documentation — whether you&apos;re a patient, student nurse or clinician.
           </p>
 
-          <!-- Benefits -->
           <ul class="mt-4 space-y-1.5 text-[11px] text-slate-600">
             <li class="flex items-start gap-2">
               <span class="mt-[3px] h-1.5 w-1.5 rounded-full bg-sky-400" />
@@ -76,10 +61,7 @@
 
         <p class="mt-6 text-[11px] text-slate-500">
           Need help? Visit
-          <RouterLink
-            to="/support"
-            class="font-medium text-sky-700 hover:text-sky-800"
-          >
+          <RouterLink to="/support" class="font-medium text-sky-700 hover:text-sky-800">
             Support &amp; help
           </RouterLink>
           .
@@ -88,53 +70,35 @@
 
       <!-- Right: login form -->
       <section class="pt-2 lg:pt-0">
-        <div
-          class="rounded-2xl bg-slate-50/90 p-4 shadow-inner ring-1 ring-slate-100 sm:p-5 lg:p-6"
-        >
+        <div class="rounded-2xl bg-slate-50/90 p-4 shadow-inner ring-1 ring-slate-100 sm:p-5 lg:p-6">
           <!-- Toast -->
           <div
             v-if="toast.visible"
             class="mb-3 flex items-start gap-2 rounded-xl px-3 py-2 text-[11px]"
             :class="{
-              'bg-sky-50 text-sky-800 ring-1 ring-sky-100':
-                toast.type === 'info',
-              'bg-emerald-50 text-emerald-800 ring-1 ring-emerald-100':
-                toast.type === 'success',
-              'bg-red-50 text-red-800 ring-1 ring-red-100':
-                toast.type === 'error',
+              'bg-sky-50 text-sky-800 ring-1 ring-sky-100': toast.type === 'info',
+              'bg-emerald-50 text-emerald-800 ring-1 ring-emerald-100': toast.type === 'success',
+              'bg-red-50 text-red-800 ring-1 ring-red-100': toast.type === 'error',
             }"
           >
             <span v-if="toast.type === 'info'">💬</span>
             <span v-else-if="toast.type === 'success'">✅</span>
             <span v-else>⚠️</span>
-            <p class="leading-snug">
-              {{ toast.message }}
-            </p>
+            <p class="leading-snug">{{ toast.message }}</p>
           </div>
 
-          <!-- Heading -->
           <header class="space-y-1.5">
-            <p
-              class="text-[11px] font-medium uppercase tracking-wide text-slate-500"
-            >
-              Sign in to continue
-            </p>
-            <h2 class="text-lg font-semibold text-slate-900">
-              Log in to your workspace
-            </h2>
+            <p class="text-[11px] font-medium uppercase tracking-wide text-slate-500">Sign in to continue</p>
+            <h2 class="text-lg font-semibold text-slate-900">Log in to your workspace</h2>
             <p class="text-[11px] text-slate-600">
-              Use your registered email and password to access your TBG Medflow
-              workspace.
+              Use your registered email and password to access your TBG Medflow workspace.
             </p>
           </header>
 
-          <!-- Form -->
           <form class="mt-4 space-y-4" @submit.prevent="handleSubmit">
             <!-- Role -->
             <div class="space-y-1">
-              <label class="text-[11px] font-medium text-slate-700">
-                I&apos;m signing in as
-              </label>
+              <label class="text-[11px] font-medium text-slate-700">I&apos;m signing in as</label>
               <select
                 v-model="form.role"
                 class="mt-0.5 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-[11px] text-slate-800 shadow-sm focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
@@ -144,19 +108,13 @@
                 <option value="clinician">Clinician / mentor</option>
                 <option value="other">Other</option>
               </select>
-              <p class="mt-1 text-[10px] text-slate-500">
-                This helps tailor the experience to your role.
-              </p>
+              <p class="mt-1 text-[10px] text-slate-500">This helps tailor the experience to your role.</p>
             </div>
 
             <!-- Email -->
             <div class="space-y-1">
-              <label
-                for="email"
-                class="text-[11px] font-medium text-slate-700"
-              >
-                Email address
-                <span class="text-red-500">*</span>
+              <label for="email" class="text-[11px] font-medium text-slate-700">
+                Email address <span class="text-red-500">*</span>
               </label>
               <input
                 id="email"
@@ -166,19 +124,13 @@
                 class="mt-0.5 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-[11px] text-slate-800 shadow-sm placeholder:text-slate-400 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
                 placeholder="you@example.com"
               />
-              <p v-if="errors.email" class="mt-1 text-[10px] text-red-500">
-                {{ errors.email }}
-              </p>
+              <p v-if="errors.email" class="mt-1 text-[10px] text-red-500">{{ errors.email }}</p>
             </div>
 
             <!-- Password -->
             <div class="space-y-1">
-              <label
-                for="password"
-                class="text-[11px] font-medium text-slate-700"
-              >
-                Password
-                <span class="text-red-500">*</span>
+              <label for="password" class="text-[11px] font-medium text-slate-700">
+                Password <span class="text-red-500">*</span>
               </label>
               <div
                 class="mt-0.5 flex items-center rounded-xl border border-slate-200 bg-white px-3 shadow-sm focus-within:border-sky-500 focus-within:ring-1 focus-within:ring-sky-500"
@@ -199,16 +151,12 @@
                   {{ showPassword ? "Hide" : "Show" }}
                 </button>
               </div>
-              <p v-if="errors.password" class="mt-1 text-[10px] text-red-500">
-                {{ errors.password }}
-              </p>
+              <p v-if="errors.password" class="mt-1 text-[10px] text-red-500">{{ errors.password }}</p>
             </div>
 
             <!-- Remember + forgot -->
             <div class="flex items-center justify-between gap-3 pt-1">
-              <label
-                class="inline-flex items-center gap-2 text-[11px] text-slate-700"
-              >
+              <label class="inline-flex items-center gap-2 text-[11px] text-slate-700">
                 <input
                   v-model="form.rememberMe"
                   type="checkbox"
@@ -217,10 +165,7 @@
                 <span>Remember this device</span>
               </label>
 
-              <RouterLink
-                to="/support"
-                class="text-[11px] font-medium text-sky-700 hover:text-sky-800"
-              >
+              <RouterLink to="/support" class="text-[11px] font-medium text-sky-700 hover:text-sky-800">
                 Forgot password?
               </RouterLink>
             </div>
@@ -235,21 +180,17 @@
               <span v-else>Signing in…</span>
             </button>
 
-            <!-- Extra links -->
             <p class="mt-3 text-center text-[11px] text-slate-600">
               Don&apos;t have an account yet?
-              <RouterLink
-                to="/register"
-                class="font-medium text-sky-700 hover:text-sky-800"
-              >
+              <RouterLink to="/register" class="font-medium text-sky-700 hover:text-sky-800">
                 Create an account
               </RouterLink>
               .
             </p>
 
             <p class="mt-1 text-center text-[10px] text-slate-500">
-              TBG Medflow does not replace emergency medical care. Always follow
-              your facility&apos;s protocols and privacy policies.
+              TBG Medflow does not replace emergency medical care. Always follow your facility&apos;s
+              protocols and privacy policies.
             </p>
           </form>
         </div>
@@ -260,14 +201,16 @@
 
 <script setup>
 import { reactive, ref } from "vue";
-import { useRouter, RouterLink } from "vue-router";
+import { useRouter, useRoute, RouterLink } from "vue-router";
 
-// ✅ correct relative paths from src/views/auth/
 import logoFull from "../../assets/tbg-medflow-logo-compressed.png";
 import logoMark from "../../assets/tbg-medflow-logo-mark.svg";
+
 import { apiPost } from "../../utils/apiClient";
+import { setSessionUser, setSessionToken } from "../../utils/session";
 
 const router = useRouter();
+const route = useRoute();
 
 const form = reactive({
   email: "",
@@ -303,7 +246,7 @@ const showToast = (type, message) => {
   toast.visible = true;
   toast.type = type;
   toast.message = message;
-  setTimeout(() => (toast.visible = false), 4000);
+  setTimeout(() => (toast.visible = false), 3500);
 };
 
 const handleSubmit = async () => {
@@ -319,17 +262,24 @@ const handleSubmit = async () => {
     const data = await apiPost("login.php", {
       email: form.email,
       password: form.password,
+      // kept for future role-tailoring; backend can ignore
       role: form.role,
     });
 
-    if (data.user) localStorage.setItem("medflowUser", JSON.stringify(data.user));
-    if (data.token) localStorage.setItem("medflowToken", data.token);
+    if (!data?.user?.id) throw new Error("Login succeeded but user data is missing.");
 
+    // ✅ session source of truth (router guard relies on this)
+    setSessionUser(data.user);
+    if (data.token) setSessionToken(data.token);
+
+    // Keep this small preference if you want (optional)
     if (form.rememberMe) localStorage.setItem("medflowRememberMe", "1");
     else localStorage.removeItem("medflowRememberMe");
 
     showToast("success", "Signed in successfully. Redirecting…");
-    router.push("/dashboard");
+
+    const redirect = typeof route.query.redirect === "string" ? route.query.redirect : "/dashboard";
+    router.replace(redirect);
   } catch (err) {
     showToast("error", err?.message || "Login failed. Please try again.");
   } finally {

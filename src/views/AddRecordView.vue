@@ -3,9 +3,7 @@
   <main class="mx-auto max-w-6xl px-4 pb-10 pt-4 sm:pt-6 lg:pt-8">
     <section class="space-y-6 sm:space-y-8">
       <!-- Page header -->
-      <header
-        class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
-      >
+      <header class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <!-- Left -->
         <div>
           <RouterLink
@@ -18,20 +16,18 @@
 
           <div class="mt-3 space-y-1.5">
             <div class="flex flex-wrap items-center gap-2">
-              <h1 class="text-2xl font-semibold text-slate-900 sm:text-3xl">
-                Add Vitals
-              </h1>
+              <h1 class="text-2xl font-semibold text-slate-900 sm:text-3xl">Add Vitals</h1>
               <span
                 class="inline-flex items-center gap-1 rounded-full bg-sky-50 px-2.5 py-1 text-[11px] font-medium text-sky-700 ring-1 ring-sky-100"
               >
                 <span class="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                Today’s entry
+                New entry
               </span>
             </div>
 
             <p class="text-sm text-slate-600">
-              Log today’s vitals in a few calm steps. You can leave fields blank
-              if you didn’t measure them.
+              Log vitals in calm steps. You can leave fields blank if you didn’t measure them.
+              <span class="font-medium">At least one vital is required</span>.
             </p>
           </div>
         </div>
@@ -43,12 +39,11 @@
           >
             <p class="font-medium text-slate-700">
               Last record
-              <span class="text-[10px] font-normal text-slate-400">
-                (from backend)
-              </span>
+              <span class="text-[10px] font-normal text-slate-400">(from backend)</span>
             </p>
             <p>{{ lastRecordLabel }}</p>
           </div>
+
           <RouterLink
             to="/records"
             class="inline-flex items-center justify-center gap-2 rounded-full border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 shadow-sm transition hover:border-sky-500 hover:text-sky-600"
@@ -70,12 +65,9 @@
             v-if="toast.visible"
             class="mb-4 rounded-xl px-3 py-2 text-[11px]"
             :class="{
-              'border border-sky-100 bg-sky-50 text-sky-800':
-                toast.type === 'info',
-              'border border-emerald-100 bg-emerald-50 text-emerald-700':
-                toast.type === 'success',
-              'border border-rose-100 bg-rose-50 text-rose-700':
-                toast.type === 'error',
+              'border border-sky-100 bg-sky-50 text-sky-800': toast.type === 'info',
+              'border border-emerald-100 bg-emerald-50 text-emerald-700': toast.type === 'success',
+              'border border-rose-100 bg-rose-50 text-rose-700': toast.type === 'error',
             }"
           >
             {{ toast.message }}
@@ -91,7 +83,7 @@
               >
                 1
               </span>
-              <span class="font-medium text-slate-800"> Visit details </span>
+              <span class="font-medium text-slate-800">Visit details</span>
             </div>
             <span class="h-px w-6 bg-slate-200" />
             <div class="inline-flex items-center gap-1.5">
@@ -121,9 +113,7 @@
                   <h2 class="text-xs font-semibold uppercase tracking-wide text-slate-500">
                     Visit details
                   </h2>
-                  <p class="mt-1 text-xs text-slate-500">
-                    When was this reading taken?
-                  </p>
+                  <p class="mt-1 text-xs text-slate-500">When was this reading taken?</p>
                 </div>
 
                 <button
@@ -147,9 +137,7 @@
                     type="date"
                     class="mt-1.5 w-full rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-900 outline-none ring-sky-100 placeholder:text-slate-400 focus:border-sky-400 focus:bg-white focus:ring-2"
                   />
-                  <p v-if="errors.date" class="mt-1 text-[11px] text-rose-600">
-                    {{ errors.date }}
-                  </p>
+                  <p v-if="errors.date" class="mt-1 text-[11px] text-rose-600">{{ errors.date }}</p>
                 </div>
 
                 <!-- Time -->
@@ -177,7 +165,7 @@
                   <option value="Night">Night</option>
                 </select>
                 <p class="mt-1 text-[11px] text-slate-500">
-                  This can make it easier to see patterns across the day.
+                  This makes it easier to spot patterns across the day.
                 </p>
               </div>
             </section>
@@ -185,23 +173,18 @@
             <!-- Vitals -->
             <section class="space-y-4">
               <div>
-                <h2 class="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                  Vitals
-                </h2>
+                <h2 class="text-xs font-semibold uppercase tracking-wide text-slate-500">Vitals</h2>
                 <p class="mt-1 text-xs text-slate-500">
-                  Enter the vitals you measured for this record. Leave blank if not measured.
+                  Enter what you measured. Leave blank if not measured.
                 </p>
               </div>
 
-              <p v-if="errors.vitals" class="text-[11px] text-rose-600">
-                {{ errors.vitals }}
-              </p>
+              <p v-if="errors.vitals" class="text-[11px] text-rose-600">{{ errors.vitals }}</p>
 
               <!-- Blood pressure -->
               <div class="rounded-2xl bg-slate-50/80 p-3.5 ring-1 ring-slate-100">
                 <p class="text-[11px] font-medium text-slate-600">
-                  Blood pressure
-                  <span class="text-[10px] text-slate-400">(mmHg)</span>
+                  Blood pressure <span class="text-[10px] text-slate-400">(mmHg)</span>
                 </p>
                 <div class="mt-3 grid gap-3 sm:grid-cols-2">
                   <div>
@@ -233,8 +216,7 @@
                   <!-- Heart rate -->
                   <div>
                     <label class="text-xs font-medium text-slate-700">
-                      Heart rate
-                      <span class="text-[11px] font-normal text-slate-400">(bpm)</span>
+                      Heart rate <span class="text-[11px] font-normal text-slate-400">(bpm)</span>
                     </label>
                     <input
                       v-model="form.heartRate"
@@ -248,8 +230,7 @@
                   <!-- Temperature -->
                   <div>
                     <label class="text-xs font-medium text-slate-700">
-                      Temperature
-                      <span class="text-[11px] font-normal text-slate-400">(°C)</span>
+                      Temperature <span class="text-[11px] font-normal text-slate-400">(°C)</span>
                     </label>
                     <input
                       v-model="form.temperature"
@@ -265,8 +246,7 @@
                 <!-- Blood sugar -->
                 <div>
                   <label class="text-xs font-medium text-slate-700">
-                    Blood sugar
-                    <span class="text-[11px] font-normal text-slate-400">(mg/dL)</span>
+                    Blood sugar <span class="text-[11px] font-normal text-slate-400">(mg/dL)</span>
                   </label>
                   <input
                     v-model="form.bloodSugar"
@@ -285,16 +265,11 @@
                 <h2 class="text-xs font-semibold uppercase tracking-wide text-slate-500">
                   Symptoms &amp; notes
                 </h2>
-                <p class="mt-1 text-xs text-slate-500">
-                  Capture how you felt at the time of this reading.
-                </p>
+                <p class="mt-1 text-xs text-slate-500">Capture how you felt at the time.</p>
               </div>
 
-              <!-- Symptoms -->
               <div>
-                <label class="text-xs font-medium text-slate-700">
-                  How are you feeling?
-                </label>
+                <label class="text-xs font-medium text-slate-700">How are you feeling?</label>
                 <textarea
                   v-model="form.symptoms"
                   rows="3"
@@ -303,11 +278,9 @@
                 ></textarea>
               </div>
 
-              <!-- Notes -->
               <div>
                 <label class="text-xs font-medium text-slate-700">
-                  Extra notes
-                  <span class="text-[11px] font-normal text-slate-400">(optional)</span>
+                  Extra notes <span class="text-[11px] font-normal text-slate-400">(optional)</span>
                 </label>
                 <textarea
                   v-model="form.notes"
@@ -321,12 +294,8 @@
             <!-- Flags -->
             <section class="space-y-3">
               <div>
-                <h2 class="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                  Extra context
-                </h2>
-                <p class="mt-1 text-xs text-slate-500">
-                  A few quick flags that can help explain your numbers.
-                </p>
+                <h2 class="text-xs font-semibold uppercase tracking-wide text-slate-500">Extra context</h2>
+                <p class="mt-1 text-xs text-slate-500">Quick flags that can explain your numbers.</p>
               </div>
 
               <div class="space-y-2">
@@ -364,8 +333,7 @@
               class="flex flex-col gap-3 border-t border-slate-100 pt-4 text-[11px] sm:flex-row sm:items-center sm:justify-between"
             >
               <p class="max-w-md text-slate-500">
-                This is not a diagnosis. Always talk to a qualified healthcare
-                professional about your results.
+                This is not a diagnosis. Always talk to a qualified healthcare professional about your results.
               </p>
 
               <div class="flex flex-wrap items-center gap-3 sm:justify-end">
@@ -398,9 +366,7 @@
             <div class="flex items-start justify-between gap-3">
               <div>
                 <h2 class="text-sm font-semibold text-slate-900">Preview</h2>
-                <p class="mt-1 text-[11px] text-slate-500">
-                  How this record will look in your dashboard.
-                </p>
+                <p class="mt-1 text-[11px] text-slate-500">How this record will look in your dashboard.</p>
               </div>
               <span
                 class="inline-flex items-center rounded-full bg-sky-100 px-2 py-0.5 text-[10px] font-medium text-sky-700"
@@ -410,19 +376,13 @@
             </div>
 
             <div class="mt-4 space-y-4 text-[11px] text-slate-700">
-              <!-- Date/session line -->
               <div class="space-y-1">
-                <p class="text-[10px] font-medium uppercase tracking-wide text-slate-500">
-                  When
-                </p>
+                <p class="text-[10px] font-medium uppercase tracking-wide text-slate-500">When</p>
                 <p>{{ previewDateLabel }}</p>
               </div>
 
-              <!-- Vitals chips -->
               <div class="space-y-1">
-                <p class="text-[10px] font-medium uppercase tracking-wide text-slate-500">
-                  Vitals
-                </p>
+                <p class="text-[10px] font-medium uppercase tracking-wide text-slate-500">Vitals</p>
                 <div class="flex flex-wrap gap-2">
                   <span
                     v-if="hasBp"
@@ -468,19 +428,13 @@
                 </div>
               </div>
 
-              <!-- Feeling -->
               <div class="space-y-1">
-                <p class="text-[10px] font-medium uppercase tracking-wide text-slate-500">
-                  Feeling
-                </p>
+                <p class="text-[10px] font-medium uppercase tracking-wide text-slate-500">Feeling</p>
                 <p class="text-[11px] text-slate-700">{{ previewFeeling }}</p>
               </div>
 
-              <!-- Flags -->
               <div class="space-y-1">
-                <p class="text-[10px] font-medium uppercase tracking-wide text-slate-500">
-                  Flags
-                </p>
+                <p class="text-[10px] font-medium uppercase tracking-wide text-slate-500">Flags</p>
                 <div class="flex flex-wrap gap-2">
                   <span
                     v-if="!form.takenMedication && !form.fasting && !form.shareWithClinician"
@@ -521,7 +475,7 @@
             <ul class="mt-3 space-y-2 leading-snug">
               <li>• Log at roughly the same time each day.</li>
               <li>• Rest quietly for 5 minutes before measuring BP or heart rate.</li>
-              <li>• Avoid caffeine, smoking or heavy exercise right before checking vitals.</li>
+              <li>• Avoid caffeine, smoking, or heavy exercise right before checking vitals.</li>
               <li>• Bring a summary of readings to your next appointment.</li>
             </ul>
             <div class="mt-3 text-[11px] text-slate-400">
@@ -542,7 +496,7 @@
 
 <script setup>
 import { computed, onMounted, reactive, ref } from "vue";
-import { useRouter } from "vue-router";
+import { useRouter, RouterLink } from "vue-router";
 
 import { apiPost } from "../utils/apiClient";
 import { fetchUserRecords, getLoggedInUser } from "../utils/records";
@@ -576,7 +530,6 @@ const form = reactive({
 
 const errors = reactive({ date: "", vitals: "" });
 const saving = ref(false);
-
 const lastRecordLabel = ref("Loading…");
 
 const setNow = () => {
@@ -591,6 +544,14 @@ const setNow = () => {
   form.time = `${hh}:${mi}`;
 };
 
+const numOrNull = (v) => {
+  if (v === null || v === undefined) return null;
+  const s = String(v).trim();
+  if (!s) return null;
+  const n = Number(s);
+  return Number.isFinite(n) ? n : null;
+};
+
 const validate = () => {
   errors.date = "";
   errors.vitals = "";
@@ -598,11 +559,11 @@ const validate = () => {
   if (!form.date) errors.date = "Date is required.";
 
   const hasVitals =
-    form.bpSystolic ||
-    form.bpDiastolic ||
-    form.heartRate ||
-    form.temperature ||
-    form.bloodSugar;
+    String(form.bpSystolic).trim() ||
+    String(form.bpDiastolic).trim() ||
+    String(form.heartRate).trim() ||
+    String(form.temperature).trim() ||
+    String(form.bloodSugar).trim();
 
   if (!hasVitals) errors.vitals = "Add at least one vital.";
 
@@ -646,19 +607,22 @@ const handleSubmit = async () => {
       date: form.date,
       time: form.time || null,
       session: form.session || null,
-      bpSystolic: form.bpSystolic || null,
-      bpDiastolic: form.bpDiastolic || null,
-      heartRate: form.heartRate || null,
-      temperature: form.temperature || null,
-      bloodSugar: form.bloodSugar || null,
-      symptoms: form.symptoms || "",
-      notes: form.notes || "",
+
+      bpSystolic: numOrNull(form.bpSystolic),
+      bpDiastolic: numOrNull(form.bpDiastolic),
+      heartRate: numOrNull(form.heartRate),
+      temperature: numOrNull(form.temperature),
+      bloodSugar: numOrNull(form.bloodSugar),
+
+      symptoms: (form.symptoms || "").trim(),
+      notes: (form.notes || "").trim(),
+
       takenMedication: !!form.takenMedication,
       fasting: !!form.fasting,
       shareWithClinician: !!form.shareWithClinician,
     });
 
-    showToast("Vitals saved successfully.", "success", 1800);
+    showToast("Vitals saved successfully.", "success", 1600);
     router.push("/records");
   } catch (e) {
     showToast(e?.message || "Failed to save vitals.", "error");
@@ -667,9 +631,15 @@ const handleSubmit = async () => {
   }
 };
 
-// ---- preview helpers (same UI behavior, now explicit & safe) ----
-const hasBp = computed(() => !!(form.bpSystolic || form.bpDiastolic));
-const hasAnyVitals = computed(() => !!(hasBp.value || form.heartRate || form.temperature || form.bloodSugar));
+// Preview helpers
+const hasBp = computed(() => !!(String(form.bpSystolic).trim() || String(form.bpDiastolic).trim()));
+const hasAnyVitals = computed(
+  () =>
+    hasBp.value ||
+    !!String(form.heartRate).trim() ||
+    !!String(form.temperature).trim() ||
+    !!String(form.bloodSugar).trim()
+);
 
 const previewFeeling = computed(() => {
   const v = (form.symptoms || "").trim();
