@@ -19,7 +19,7 @@
       <!-- Left -->
       <div>
         <RouterLink
-          to="/dashboard"
+          :to="{ name: 'dashboard' }"
           class="inline-flex items-center gap-2 rounded-full bg-white/70 px-3 py-1.5 text-[11px] font-medium text-slate-600 shadow-sm ring-1 ring-slate-200 transition hover:bg-slate-50 hover:text-slate-900"
         >
           <span class="text-sm">←</span>
@@ -47,7 +47,7 @@
         </p>
 
         <RouterLink
-          to="/add"
+          :to="{ name: 'add-record' }"
           class="inline-flex items-center justify-center gap-2 rounded-full bg-sky-600 px-4 py-2 text-xs font-semibold text-white shadow-md shadow-sky-500/25 transition hover:bg-sky-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-50"
         >
           <span class="flex h-4 w-4 items-center justify-center rounded-full bg-sky-500 text-[11px]">＋</span>
@@ -183,7 +183,7 @@
               Retry
             </button>
             <RouterLink
-              to="/add"
+              :to="{ name: 'add-record' }"
               class="inline-flex items-center justify-center rounded-full border border-rose-200 bg-white px-4 py-2 text-[11px] font-semibold text-rose-700 hover:bg-rose-100"
             >
               Add vitals
@@ -245,7 +245,7 @@
         >
           <p>No records yet.</p>
           <RouterLink
-            to="/add"
+            :to="{ name: 'add-record' }"
             class="mt-3 inline-flex items-center justify-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-[11px] font-semibold text-white shadow-sm hover:bg-slate-800"
           >
             <span>＋</span>
@@ -270,7 +270,7 @@
               Clear filters
             </button>
             <RouterLink
-              to="/add"
+              :to="{ name: 'add-record' }"
               class="inline-flex items-center justify-center gap-2 rounded-full bg-sky-600 px-4 py-1.5 text-[11px] font-semibold text-white shadow-sm hover:bg-sky-700"
             >
               <span>＋</span>
@@ -306,7 +306,9 @@
                   {{ record.displayDate }} · {{ record.time }}
                 </p>
                 <p class="flex flex-wrap items-center gap-2 text-[11px]">
-                  <span class="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-medium text-slate-600">
+                  <span
+                    class="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-medium text-slate-600"
+                  >
                     {{ prettySession(record.session) }}
                   </span>
                   <span class="text-slate-400">{{ record.date }}</span>
@@ -315,7 +317,9 @@
 
               <div class="text-[11px] text-slate-700">
                 <p class="truncate">
-                  <span v-if="record.bpSystolic && record.bpDiastolic">BP {{ record.bpSystolic }}/{{ record.bpDiastolic }} mmHg</span>
+                  <span v-if="record.bpSystolic && record.bpDiastolic">
+                    BP {{ record.bpSystolic }}/{{ record.bpDiastolic }} mmHg
+                  </span>
                   <span v-if="record.heartRate"> · HR {{ record.heartRate }} bpm</span>
                   <span v-if="record.temperature != null"> · Temp {{ record.temperature }} °C</span>
                   <span v-if="record.bloodSugar"> · Sugar {{ record.bloodSugar }} mg/dL</span>
@@ -344,24 +348,32 @@
               @click="selectedId = record.id"
               :class="[
                 'w-full rounded-2xl border px-3 py-2 text-left text-[11px] transition',
-                selectedId === record.id ? 'border-sky-200 bg-sky-50 shadow-sm' : 'border-slate-100 bg-white hover:bg-slate-50',
+                selectedId === record.id
+                  ? 'border-sky-200 bg-sky-50 shadow-sm'
+                  : 'border-slate-100 bg-white hover:bg-slate-50',
               ]"
             >
               <div class="flex items-center justify-between gap-2">
                 <p class="text-xs font-medium text-slate-800">{{ record.displayDate }} · {{ record.time }}</p>
                 <span class="text-slate-300">›</span>
               </div>
-              <p class="mt-0.5 text-[10px] text-slate-500">{{ prettySession(record.session) }} • {{ record.date }}</p>
+              <p class="mt-0.5 text-[10px] text-slate-500">
+                {{ prettySession(record.session) }} • {{ record.date }}
+              </p>
 
               <p class="mt-1 text-[11px] text-slate-700">
-                <span v-if="record.bpSystolic && record.bpDiastolic">BP {{ record.bpSystolic }}/{{ record.bpDiastolic }} mmHg</span>
+                <span v-if="record.bpSystolic && record.bpDiastolic">
+                  BP {{ record.bpSystolic }}/{{ record.bpDiastolic }} mmHg
+                </span>
                 <span v-if="record.heartRate"> · HR {{ record.heartRate }} bpm</span>
                 <span v-if="record.temperature != null"> · Temp {{ record.temperature }} °C</span>
                 <span v-if="record.bloodSugar"> · Sugar {{ record.bloodSugar }} mg/dL</span>
                 <span v-if="!hasAnyVitals(record)" class="text-slate-400">No vitals</span>
               </p>
 
-              <p class="mt-1 line-clamp-2 text-[11px] text-slate-600">{{ previewText(record.symptoms || record.notes) }}</p>
+              <p class="mt-1 line-clamp-2 text-[11px] text-slate-600">
+                {{ previewText(record.symptoms || record.notes) }}
+              </p>
             </button>
           </div>
         </div>
@@ -369,7 +381,9 @@
 
       <!-- Right -->
       <aside class="space-y-4">
-        <article class="min-h-[220px] rounded-2xl bg-gradient-to-br from-sky-50 via-white to-emerald-50 p-4 shadow-sm ring-1 ring-sky-100 sm:p-5">
+        <article
+          class="min-h-[220px] rounded-2xl bg-gradient-to-br from-sky-50 via-white to-emerald-50 p-4 shadow-sm ring-1 ring-sky-100 sm:p-5"
+        >
           <div v-if="isLoading" class="space-y-3 animate-pulse">
             <div class="h-3 w-28 rounded bg-slate-200" />
             <div class="h-5 w-56 rounded bg-slate-200" />
@@ -389,14 +403,19 @@
           <div v-else class="space-y-4 text-[11px] text-slate-700">
             <div>
               <p class="text-[10px] font-medium uppercase tracking-wide text-slate-500">Record detail</p>
-              <h2 class="mt-1 text-lg font-semibold text-slate-900">{{ selectedRecord.displayDate }} · {{ selectedRecord.time }}</h2>
+              <h2 class="mt-1 text-lg font-semibold text-slate-900">
+                {{ selectedRecord.displayDate }} · {{ selectedRecord.time }}
+              </h2>
               <p class="mt-1 text-[11px] text-slate-500">
                 Session: {{ prettySession(selectedRecord.session) }} • {{ selectedRecord.date }}
               </p>
             </div>
 
             <div class="grid gap-3 sm:grid-cols-2">
-              <div v-if="selectedRecord.bpSystolic && selectedRecord.bpDiastolic" class="rounded-xl bg-white/80 p-3 ring-1 ring-slate-100">
+              <div
+                v-if="selectedRecord.bpSystolic && selectedRecord.bpDiastolic"
+                class="rounded-xl bg-white/80 p-3 ring-1 ring-slate-100"
+              >
                 <p class="text-[10px] font-medium text-slate-500">Blood pressure</p>
                 <p class="mt-1 text-sm font-semibold text-slate-900">
                   {{ selectedRecord.bpSystolic }}/{{ selectedRecord.bpDiastolic }}
@@ -412,7 +431,10 @@
                 </p>
               </div>
 
-              <div v-if="selectedRecord.temperature != null" class="rounded-xl bg-white/80 p-3 ring-1 ring-slate-100">
+              <div
+                v-if="selectedRecord.temperature != null"
+                class="rounded-xl bg-white/80 p-3 ring-1 ring-slate-100"
+              >
                 <p class="text-[10px] font-medium text-slate-500">Temperature</p>
                 <p class="mt-1 text-sm font-semibold text-slate-900">
                   {{ selectedRecord.temperature }}
@@ -432,26 +454,41 @@
             <div class="space-y-2">
               <div>
                 <p class="text-[10px] font-medium uppercase tracking-wide text-slate-500">Symptoms</p>
-                <p class="mt-1 text-[11px] text-slate-700">{{ selectedRecord.symptoms ? selectedRecord.symptoms : "No symptoms recorded." }}</p>
+                <p class="mt-1 text-[11px] text-slate-700">
+                  {{ selectedRecord.symptoms ? selectedRecord.symptoms : "No symptoms recorded." }}
+                </p>
               </div>
               <div>
                 <p class="text-[10px] font-medium uppercase tracking-wide text-slate-500">Notes</p>
-                <p class="mt-1 text-[11px] text-slate-700">{{ selectedRecord.notes ? selectedRecord.notes : "No additional notes for this record." }}</p>
+                <p class="mt-1 text-[11px] text-slate-700">
+                  {{ selectedRecord.notes ? selectedRecord.notes : "No additional notes for this record." }}
+                </p>
               </div>
             </div>
 
             <div class="space-y-1">
               <p class="text-[10px] font-medium uppercase tracking-wide text-slate-500">Flags</p>
               <div class="flex flex-wrap gap-2">
-                <span v-if="!hasAnyFlags(selectedRecord)" class="text-[11px] text-slate-400">No extra flags for this record.</span>
+                <span v-if="!hasAnyFlags(selectedRecord)" class="text-[11px] text-slate-400">
+                  No extra flags for this record.
+                </span>
 
-                <span v-if="selectedRecord.flags?.takenMedication" class="inline-flex items-center gap-1 rounded-full bg-slate-900 px-2.5 py-1 text-[10px] font-medium text-slate-50">
+                <span
+                  v-if="selectedRecord.flags?.takenMedication"
+                  class="inline-flex items-center gap-1 rounded-full bg-slate-900 px-2.5 py-1 text-[10px] font-medium text-slate-50"
+                >
                   💊 Medication taken
                 </span>
-                <span v-if="selectedRecord.flags?.fasting" class="inline-flex items-center gap-1 rounded-full bg-slate-900 px-2.5 py-1 text-[10px] font-medium text-slate-50">
+                <span
+                  v-if="selectedRecord.flags?.fasting"
+                  class="inline-flex items-center gap-1 rounded-full bg-slate-900 px-2.5 py-1 text-[10px] font-medium text-slate-50"
+                >
                   🌙 Fasting
                 </span>
-                <span v-if="selectedRecord.flags?.shareWithClinician" class="inline-flex items-center gap-1 rounded-full bg-slate-900 px-2.5 py-1 text-[10px] font-medium text-slate-50">
+                <span
+                  v-if="selectedRecord.flags?.shareWithClinician"
+                  class="inline-flex items-center gap-1 rounded-full bg-slate-900 px-2.5 py-1 text-[10px] font-medium text-slate-50"
+                >
                   📤 Marked to share with clinician
                 </span>
               </div>
@@ -484,7 +521,10 @@
               📋 Copy summary
             </button>
 
-            <RouterLink to="/add" class="inline-flex items-center gap-2 rounded-full bg-sky-500 px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-sky-600">
+            <RouterLink
+              :to="{ name: 'add-record' }"
+              class="inline-flex items-center gap-2 rounded-full bg-sky-500 px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-sky-600"
+            >
               ＋ Add vitals
             </RouterLink>
           </div>
@@ -497,7 +537,6 @@
 <script setup>
 import { computed, onMounted, reactive, ref, watch } from "vue";
 import { RouterLink, useRouter } from "vue-router";
-
 import { fetchUserRecords, getLoggedInUser } from "../utils/records";
 
 const router = useRouter();
@@ -535,7 +574,6 @@ const prettySession = (session) => {
   if (s === "afternoon") return "Afternoon";
   if (s === "evening") return "Evening";
   if (s === "night") return "Night";
-  // fallback: keep whatever came from backend
   return String(session);
 };
 
@@ -565,40 +603,18 @@ const resetFilters = () => {
   filterRange.value = "7d";
 };
 
-const parseTimeToMinutes = (timeStr) => {
-  const t = String(timeStr || "").trim();
-  if (!t) return 0;
-
-  // "HH:MM"
-  const m24 = t.match(/^(\d{1,2}):(\d{2})$/);
-  if (m24) {
-    const hh = Math.max(0, Math.min(23, Number(m24[1])));
-    const mm = Math.max(0, Math.min(59, Number(m24[2])));
-    return hh * 60 + mm;
-  }
-
-  // "H:MM AM/PM" or "HH:MM AM/PM"
-  const m12 = t.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
-  if (m12) {
-    let hh = Number(m12[1]);
-    const mm = Number(m12[2]);
-    const ap = m12[3].toUpperCase();
-    if (hh === 12) hh = 0;
-    if (ap === "PM") hh += 12;
-    return hh * 60 + mm;
-  }
-
-  return 0;
+const dateKey = (ymd) => {
+  const s = String(ymd || "");
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(s)) return 0;
+  const y = Number(s.slice(0, 4)) || 0;
+  const m = Number(s.slice(5, 7)) || 0;
+  const d = Number(s.slice(8, 10)) || 0;
+  return y * 10000 + m * 100 + d;
 };
 
-const toSortKey = (r) => {
-  // date is usually YYYY-MM-DD; safe numeric key for sorting
-  const d = String(r?.date || "");
-  const y = Number(d.slice(0, 4)) || 0;
-  const m = Number(d.slice(5, 7)) || 0;
-  const day = Number(d.slice(8, 10)) || 0;
-  const minutes = parseTimeToMinutes(r?.time);
-  return y * 100000000 + m * 1000000 + day * 10000 + minutes;
+const sortKey = (r) => {
+  // records.js normalizer adds timeMinutes; fall back safely if missing
+  return dateKey(r?.date) * 10000 + (Number(r?.timeMinutes) || 0);
 };
 
 const fetchRecords = async () => {
@@ -610,18 +626,21 @@ const fetchRecords = async () => {
     if (!user?.id) {
       loadError.value = "You’re not logged in. Please log in again.";
       showToast(loadError.value, "error");
-      router.push("/login");
+      router.push({ name: "login", query: { redirect: "/records" } });
       return;
     }
 
+    // ✅ single source of truth (handles list_records.php / fallback)
     const list = await fetchUserRecords(user.id);
+
+    // fetchUserRecords already normalizes and sorts newest-first
     records.value = Array.isArray(list) ? list : [];
 
     if (!records.value.length) selectedId.value = null;
     else if (!selectedId.value) selectedId.value = records.value[0].id;
     else if (!records.value.some((r) => r.id === selectedId.value)) selectedId.value = records.value[0].id;
   } catch (err) {
-    const msg = err?.message || "Something went wrong while loading records. Check your API and try again.";
+    const msg = err?.message || "Failed to load records. Check your API and try again.";
     loadError.value = msg;
     showToast(msg, "error", 4200);
   } finally {
@@ -632,10 +651,10 @@ const fetchRecords = async () => {
 const filteredRecords = computed(() => {
   let list = [...records.value];
 
-  // newest first (date + time)
-  list.sort((a, b) => toSortKey(b) - toSortKey(a));
+  // keep newest-first even after filters/search
+  list.sort((a, b) => sortKey(b) - sortKey(a));
 
-  // date range filter (based on date only)
+  // range filter (date-only)
   if (filterRange.value !== "all") {
     const now = new Date();
     const todayLocal = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -656,7 +675,7 @@ const filteredRecords = computed(() => {
     });
   }
 
-  // session filter (case-safe)
+  // session filter
   if (filterSession.value !== "all") {
     const want = sessionKey(filterSession.value);
     list = list.filter((r) => sessionKey(r.session) === want);

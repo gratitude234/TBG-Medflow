@@ -37,10 +37,16 @@
           </div>
 
           <div v-else class="ml-2 flex items-center gap-2">
-            <RouterLink to="/login" class="rounded-full px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-100">
+            <RouterLink
+              to="/login"
+              class="rounded-full px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-100"
+            >
               Log in
             </RouterLink>
-            <RouterLink to="/register" class="rounded-full bg-sky-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm shadow-sky-500/25 hover:bg-sky-700">
+            <RouterLink
+              to="/register"
+              class="rounded-full bg-sky-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm shadow-sky-500/25 hover:bg-sky-700"
+            >
               Get started
             </RouterLink>
           </div>
@@ -139,7 +145,7 @@
 
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
-import { RouterLink, RouterView, useRoute } from "vue-router";
+import { RouterLink, RouterView, useRoute, useRouter } from "vue-router";
 
 import logoFull from "./assets/tbg-medflow-logo-compressed.png";
 import logoMark from "./assets/tbg-medflow-logo-mark.svg";
@@ -147,9 +153,11 @@ import logoMark from "./assets/tbg-medflow-logo-mark.svg";
 import BottomNav from "./components/BottomNav.vue";
 import { clearSession, getSessionUser } from "./utils/session";
 
+const router = useRouter();
+const route = useRoute();
+
 const mobileNavOpen = ref(false);
 const isScrolled = ref(false);
-const route = useRoute();
 
 const sessionUser = ref(null);
 
@@ -158,7 +166,7 @@ const refreshSession = () => {
 };
 
 const showBottomNav = computed(() => {
-  // show when logged in (patient-first IA). Later you can restrict: sessionUser.value?.role === 'patient'
+  // show when logged in (patient-first IA)
   return !!sessionUser.value;
 });
 
@@ -170,10 +178,12 @@ const navLinks = computed(() => {
     ];
   }
 
+  // Logged-in nav (now includes Encounters)
   return [
     { label: "Dashboard", to: "/dashboard" },
     { label: "Add Vitals", to: "/add" },
     { label: "Records", to: "/records" },
+    { label: "Encounters", to: "/encounters" },
     { label: "Share", to: "/share" },
     { label: "Profile", to: "/profile" },
   ];
@@ -195,8 +205,8 @@ const isActive = (to) => {
 const logout = () => {
   clearSession();
   closeMobileMenu();
-  // optional: route to login, but don’t force it here (some screens can be public)
-  // router.push("/login");
+  // keep UX simple: after logout, go to login
+  router.push("/login");
 };
 
 onMounted(() => {

@@ -24,9 +24,10 @@
         <span class="text-xl leading-none">＋</span>
       </RouterLink>
 
-      <RouterLink :to="links.share" class="nav-item" :class="{ active: isActive('/share') }">
-        <span class="icon">📤</span>
-        <span class="label">Share</span>
+      <!-- ✅ New: Encounters -->
+      <RouterLink :to="links.encounters" class="nav-item" :class="{ active: isActive('/encounters') }">
+        <span class="icon">📝</span>
+        <span class="label">Notes</span>
       </RouterLink>
 
       <RouterLink :to="links.profile" class="nav-item" :class="{ active: isActive('/profile') }">
@@ -49,12 +50,12 @@ const route = useRoute();
 
 const links = computed(() => {
   // For now: same links for all roles.
-  // Later you can branch by role (clinician/student) with different tabs.
+  // Later: split by role (patient vs student/clinician) into different tabs.
   return {
     dashboard: "/dashboard",
     add: "/add",
     records: "/records",
-    share: "/share",
+    encounters: "/encounters",
     profile: "/profile",
   };
 });

@@ -5,6 +5,8 @@ import HomeView from "../views/HomeView.vue";
 import DashboardView from "../views/DashboardView.vue";
 import AddRecordView from "../views/AddRecordView.vue";
 import RecordsView from "../views/RecordsView.vue";
+import EncountersView from "../views/EncountersView.vue";
+import AddEncounterView from "../views/AddEncounterView.vue";
 import ShareView from "../views/ShareView.vue";
 import ProfileView from "../views/ProfileView.vue";
 import AboutView from "../views/AboutView.vue";
@@ -16,10 +18,8 @@ import { isLoggedIn } from "../utils/session";
 
 const routes = [
   { path: "/", name: "home", component: HomeView },
-
   { path: "/login", name: "login", component: LoginView },
 
-  // "Get started" CTA – points to register
   {
     path: "/get-started",
     name: "get-started",
@@ -30,7 +30,6 @@ const routes = [
   // Protected
   { path: "/dashboard", name: "dashboard", component: DashboardView },
 
-  // ✅ Canonical "Add" path is /add (keeps old links working)
   {
     path: "/add",
     name: "add",
@@ -39,6 +38,16 @@ const routes = [
   },
 
   { path: "/records", name: "records", component: RecordsView },
+
+  // ✅ Encounters
+  { path: "/encounters", name: "encounters", component: EncountersView },
+  {
+    path: "/encounters/new",
+    name: "add-encounter",
+    component: AddEncounterView,
+    alias: "/visit/new",
+  },
+
   { path: "/share", name: "share", component: ShareView },
   { path: "/profile", name: "profile", component: ProfileView },
 
@@ -55,21 +64,17 @@ const router = createRouter({
   },
 });
 
-// ---- Simple Auth Guard ----
 const PUBLIC_NAMES = new Set(["home", "login", "get-started", "about", "support"]);
 
 router.beforeEach((to) => {
   const loggedIn = isLoggedIn();
 
-  // If already logged in, keep auth pages out of the way
   if (loggedIn && (to.name === "login" || to.name === "get-started")) {
     return { name: "dashboard" };
   }
 
-  // Allow public routes
   if (PUBLIC_NAMES.has(to.name)) return true;
 
-  // Protect everything else
   if (!loggedIn) {
     return { name: "login", query: { redirect: to.fullPath } };
   }

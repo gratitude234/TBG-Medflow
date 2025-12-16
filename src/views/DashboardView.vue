@@ -30,6 +30,15 @@
             Add vitals
           </RouterLink>
 
+          <!-- ✅ New: Visit note -->
+          <RouterLink
+            to="/encounters/new"
+            class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-700 shadow-sm transition hover:border-sky-500 hover:text-sky-700"
+          >
+            <span aria-hidden="true">📝</span>
+            New visit note
+          </RouterLink>
+
           <RouterLink
             to="/share"
             class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-700 shadow-sm transition hover:border-sky-500 hover:text-sky-700"
@@ -77,7 +86,9 @@
           <p class="mt-3 text-lg font-semibold text-slate-900">{{ item.value }}</p>
 
           <div class="mt-2 flex items-center justify-between gap-2">
-            <p class="inline-flex items-center rounded-full bg-slate-50 px-2 py-0.5 text-[11px] font-medium text-slate-600 group-hover:bg-sky-50 group-hover:text-sky-700">
+            <p
+              class="inline-flex items-center rounded-full bg-slate-50 px-2 py-0.5 text-[11px] font-medium text-slate-600 group-hover:bg-sky-50 group-hover:text-sky-700"
+            >
               {{ item.status }}
             </p>
             <p class="text-[10px] text-slate-400">{{ item.helper }}</p>
@@ -110,7 +121,10 @@
             </RouterLink>
           </div>
 
-          <div v-if="isLoading && !hasRecords" class="mt-4 rounded-xl bg-slate-50 px-4 py-6 text-center text-xs text-slate-500">
+          <div
+            v-if="isLoading && !hasRecords"
+            class="mt-4 rounded-xl bg-slate-50 px-4 py-6 text-center text-xs text-slate-500"
+          >
             Loading your records…
           </div>
 
@@ -192,6 +206,27 @@
               <span aria-hidden="true">↗</span>
             </RouterLink>
 
+            <!-- ✅ New: Encounter quick action -->
+            <RouterLink
+              to="/encounters/new"
+              class="inline-flex w-full items-center justify-between rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-medium text-slate-700 shadow-sm transition hover:border-sky-500 hover:text-sky-600"
+            >
+              <span class="inline-flex items-center gap-2">
+                <span aria-hidden="true">📝</span> New visit note (SOAP)
+              </span>
+              <span aria-hidden="true">↗</span>
+            </RouterLink>
+
+            <RouterLink
+              to="/encounters"
+              class="inline-flex w-full items-center justify-between rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-medium text-slate-700 shadow-sm transition hover:border-sky-500 hover:text-sky-600"
+            >
+              <span class="inline-flex items-center gap-2">
+                <span aria-hidden="true">🗂️</span> View encounter notes
+              </span>
+              <span aria-hidden="true">↗</span>
+            </RouterLink>
+
             <RouterLink
               to="/records"
               class="inline-flex w-full items-center justify-between rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-medium text-slate-700 shadow-sm transition hover:border-sky-500 hover:text-sky-600"
@@ -234,8 +269,8 @@
 import { computed, onMounted, ref } from "vue";
 import { RouterLink, useRouter } from "vue-router";
 
-// Uses your existing utilities (so we don't break existing API usage)
-import { fetchUserRecords, getLoggedInUser } from "../utils/records";
+import { fetchUserRecords } from "../utils/records";
+import { getSessionUser } from "../utils/session";
 
 const router = useRouter();
 
@@ -249,7 +284,7 @@ const fetchDashboard = async () => {
   errorMessage.value = "";
 
   try {
-    const user = getLoggedInUser();
+    const user = getSessionUser();
     if (!user?.id) {
       router.push("/login");
       return;
