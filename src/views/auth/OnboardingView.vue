@@ -107,7 +107,6 @@
               <p v-if="errors.level" class="text-[10px] text-red-500">{{ errors.level }}</p>
             </div>
 
-            <!-- ✅ NEW: Department/Program -->
             <div class="space-y-1 sm:col-span-2">
               <label class="text-[11px] font-medium text-slate-700">
                 Department / Program <span class="text-red-500">*</span>
@@ -177,7 +176,6 @@
               <p v-if="errors.specialty" class="text-[10px] text-red-500">{{ errors.specialty }}</p>
             </div>
 
-            <!-- ✅ NEW: Work email (optional) -->
             <div class="space-y-1 sm:col-span-2">
               <label class="text-[11px] font-medium text-slate-700">Work email (optional)</label>
               <input
@@ -249,7 +247,6 @@
               <p v-if="errors.purpose" class="text-[10px] text-red-500">{{ errors.purpose }}</p>
             </div>
 
-            <!-- ✅ NEW: Organisation (optional) -->
             <div class="space-y-1 sm:col-span-2">
               <label class="text-[11px] font-medium text-slate-700">Organisation (optional)</label>
               <input
@@ -324,6 +321,7 @@
 import { computed, onMounted, reactive, ref } from "vue";
 import { RouterLink, useRoute, useRouter } from "vue-router";
 
+import { patchAccount } from "../../services/auth";
 import { getSessionUser, setSessionUser } from "../../utils/session";
 import {
   getProfile,
@@ -346,7 +344,7 @@ const toast = reactive({ visible: true, type: "info", message: "Complete setup t
 const form = reactive({
   // Student
   institution: "",
-  department: "", // ✅ NEW
+  department: "",
   level: "",
   posting: "",
   mentorEmail: "",
@@ -354,14 +352,14 @@ const form = reactive({
   // Clinician
   facility: "",
   specialty: "",
-  workEmail: "", // ✅ NEW
+  workEmail: "",
   verification: "request",
   inviteCode: "",
 
   // Other
   category: "caregiver",
   purpose: "",
-  organisation: "", // ✅ NEW
+  organisation: "",
 
   // Patient minimal
   patientContext: "self",
@@ -369,7 +367,7 @@ const form = reactive({
 
 const errors = reactive({
   institution: "",
-  department: "", // ✅ NEW
+  department: "",
   level: "",
   facility: "",
   specialty: "",
@@ -455,7 +453,7 @@ async function submit() {
       ...(role.value === "student"
         ? {
             institution: form.institution.trim(),
-            department: form.department.trim(), // ✅ NEW
+            department: form.department.trim(),
             level: form.level.trim(),
             posting: form.posting.trim(),
             mentorEmail: form.mentorEmail.trim(),
@@ -464,7 +462,7 @@ async function submit() {
           ? {
               facility: form.facility.trim(),
               specialty: form.specialty.trim(),
-              workEmail: form.workEmail.trim(), // ✅ NEW
+              workEmail: form.workEmail.trim(),
               verification: form.verification,
               inviteCode: form.verification === "invite" ? form.inviteCode.trim() : "",
               status: form.verification === "invite" ? "verified-mock" : "pending-mock",
@@ -473,17 +471,23 @@ async function submit() {
             ? {
                 category: form.category,
                 purpose: form.purpose.trim(),
-                organisation: form.organisation.trim(), // ✅ NEW
+                organisation: form.organisation.trim(),
               }
             : {
                 patientContext: form.patientContext,
               }),
     };
 
+    // Save onboarding profile + completion flags (localStorage)
     saveProfile(user.value.id, payload);
     setOnboardingComplete(user.value.id, true);
 
-    setSessionUser({ ...user.value, role: role.value, onboardingComplete: true });
+    // Keep session consistent
+    const updatedUser = { ...user.value, role: role.value, onboardingComplete: true };
+    setSessionUser(updatedUser);
+
+    // Also patch account record in local mode (backend-ready shape)
+    await patchAccount(user.value.id, { role: role.value, onboardingComplete: true });
 
     showToast("success", "Setup complete. Redirecting…");
     router.replace(nextPath());
@@ -494,13 +498,17 @@ async function submit() {
   }
 }
 
-function skip() {
+async function skip() {
   if (!user.value?.id) return;
 
   setOnboardingComplete(user.value.id, true);
   saveProfile(user.value.id, { role: role.value, patientContext: form.patientContext });
 
-  setSessionUser({ ...user.value, role: role.value, onboardingComplete: true });
+  const updatedUser = { ...user.value, role: role.value, onboardingComplete: true };
+  setSessionUser(updatedUser);
+
+  await patchAccount(user.value.id, { role: role.value, onboardingComplete: true });
+
   router.replace(nextPath());
 }
 

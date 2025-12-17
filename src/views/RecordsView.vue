@@ -27,15 +27,36 @@
         </RouterLink>
 
         <div class="mt-3 space-y-1">
-          <div class="flex items-center gap-2">
+          <div class="flex flex-wrap items-center gap-2">
             <h1 class="text-2xl font-semibold text-slate-900 sm:text-2xl">Records</h1>
+
             <span
               class="inline-flex items-center gap-1 rounded-full bg-sky-50 px-2.5 py-1 text-[11px] font-medium text-sky-700 ring-1 ring-sky-100"
             >
-              📋 Vitals history
+              📋 Vitals records
+            </span>
+
+            <span
+              v-if="roleKey"
+              class="inline-flex items-center gap-2 rounded-full px-3 py-1 text-[11px] font-semibold ring-1"
+              :class="roleBadgeClass"
+              title="Your role is stored on your account"
+            >
+              <span class="h-1.5 w-1.5 rounded-full" :class="roleDotClass" />
+              {{ roleLabelText }}
             </span>
           </div>
-          <p class="text-sm text-slate-600">Browse and review your previous vitals in one place.</p>
+
+          <p class="text-sm text-slate-600">
+            {{ headerSubtitle }}
+          </p>
+
+          <p
+            v-if="roleKey !== 'patient'"
+            class="text-[11px] text-slate-500"
+          >
+            MVP note: right now, records are saved under the signed-in account. Shared patient workspaces come next.
+          </p>
         </div>
       </div>
 
@@ -51,7 +72,7 @@
           class="inline-flex items-center justify-center gap-2 rounded-full bg-sky-600 px-4 py-2 text-xs font-semibold text-white shadow-md shadow-sky-500/25 transition hover:bg-sky-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-50"
         >
           <span class="flex h-4 w-4 items-center justify-center rounded-full bg-sky-500 text-[11px]">＋</span>
-          <span>Add vitals</span>
+          <span>{{ addButtonLabel }}</span>
         </RouterLink>
       </div>
     </header>
@@ -73,7 +94,7 @@
             id="records-search"
             v-model="searchQuery"
             type="text"
-            placeholder="Search by note, symptom, session or date…"
+            placeholder="Search notes, symptoms, date, or session…"
             class="w-full bg-transparent text-xs text-slate-900 placeholder:text-slate-400 focus:outline-none"
             :disabled="isLoading"
           />
@@ -142,7 +163,7 @@
       <article class="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-100 sm:p-5">
         <div class="flex items-start justify-between gap-3">
           <div>
-            <h2 class="text-sm font-semibold text-slate-900">Records</h2>
+            <h2 class="text-sm font-semibold text-slate-900">Vitals records</h2>
             <p class="mt-1 text-xs text-slate-500">Tap a row to see full details on the right.</p>
           </div>
 
@@ -186,7 +207,7 @@
               :to="{ name: 'add-record' }"
               class="inline-flex items-center justify-center rounded-full border border-rose-200 bg-white px-4 py-2 text-[11px] font-semibold text-rose-700 hover:bg-rose-100"
             >
-              Add vitals
+              {{ addButtonLabel }}
             </RouterLink>
           </div>
         </div>
@@ -238,19 +259,38 @@
           </div>
         </div>
 
-        <!-- Empty -->
+        <!-- Empty (ROLE-AWARE) -->
         <div
           v-else-if="!totalCount"
-          class="mt-6 rounded-2xl bg-slate-50 px-4 py-6 text-center text-xs text-slate-500"
+          class="mt-6 space-y-3 rounded-2xl bg-slate-50 px-4 py-6 text-center text-xs text-slate-600"
         >
-          <p>No records yet.</p>
-          <RouterLink
-            :to="{ name: 'add-record' }"
-            class="mt-3 inline-flex items-center justify-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-[11px] font-semibold text-white shadow-sm hover:bg-slate-800"
-          >
-            <span>＋</span>
-            <span>Add your first vitals</span>
-          </RouterLink>
+          <p class="font-semibold text-slate-900">{{ emptyState.title }}</p>
+          <p class="text-[11px] text-slate-600">{{ emptyState.body }}</p>
+
+          <div class="mt-3 flex flex-wrap justify-center gap-2">
+            <RouterLink
+              :to="{ name: 'add-record' }"
+              class="inline-flex items-center justify-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-[11px] font-semibold text-white shadow-sm hover:bg-slate-800"
+            >
+              <span>＋</span>
+              <span>{{ emptyState.primaryCta }}</span>
+            </RouterLink>
+
+            <RouterLink
+              v-if="emptyState.secondaryTo"
+              :to="emptyState.secondaryTo"
+              class="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-4 py-2 text-[11px] font-semibold text-slate-700 hover:bg-slate-100"
+            >
+              {{ emptyState.secondaryCta }}
+            </RouterLink>
+
+            <RouterLink
+              to="/support"
+              class="inline-flex items-center justify-center rounded-full border border-slate-200 bg-white px-4 py-2 text-[11px] font-semibold text-slate-700 hover:bg-slate-100"
+            >
+              Privacy & help
+            </RouterLink>
+          </div>
         </div>
 
         <!-- No matches -->
@@ -259,7 +299,7 @@
           class="mt-6 space-y-3 rounded-2xl bg-slate-50 px-4 py-6 text-center text-xs text-slate-500"
         >
           <p class="font-medium text-slate-700">No records match your filters.</p>
-          <p class="text-[11px] text-slate-500">Try adjusting your search, session filter or date range.</p>
+          <p class="text-[11px] text-slate-500">Try clearing filters or searching with fewer words.</p>
 
           <div class="mt-3 flex flex-wrap justify-center gap-2">
             <button
@@ -274,7 +314,7 @@
               class="inline-flex items-center justify-center gap-2 rounded-full bg-sky-600 px-4 py-1.5 text-[11px] font-semibold text-white shadow-sm hover:bg-sky-700"
             >
               <span>＋</span>
-              <span>Add vitals</span>
+              <span>{{ addButtonLabel }}</span>
             </RouterLink>
           </div>
         </div>
@@ -525,7 +565,7 @@
               :to="{ name: 'add-record' }"
               class="inline-flex items-center gap-2 rounded-full bg-sky-500 px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-sky-600"
             >
-              ＋ Add vitals
+              ＋ {{ addButtonLabel }}
             </RouterLink>
           </div>
         </article>
@@ -538,6 +578,7 @@
 import { computed, onMounted, reactive, ref, watch } from "vue";
 import { RouterLink, useRouter } from "vue-router";
 import { fetchUserRecords, getLoggedInUser } from "../utils/records";
+import { normalizeRole, roleLabel as roleLabelFn } from "../utils/profile";
 
 const router = useRouter();
 
@@ -550,6 +591,8 @@ const showToast = (message, type = "info", ms = 2600) => {
   toast._t = setTimeout(() => (toast.visible = false), ms);
 };
 
+const sessionUser = ref(null);
+
 const records = ref([]);
 const isLoading = ref(false);
 const loadError = ref("");
@@ -558,6 +601,82 @@ const searchQuery = ref("");
 const filterSession = ref("all");
 const filterRange = ref("7d");
 const selectedId = ref(null);
+
+const roleKey = computed(() => normalizeRole(sessionUser.value?.role || "patient"));
+const roleLabelText = computed(() => roleLabelFn(roleKey.value));
+
+const roleBadgeClass = computed(() => {
+  const r = roleKey.value;
+  if (r === "student") return "bg-emerald-50 text-emerald-800 ring-emerald-100";
+  if (r === "clinician") return "bg-indigo-50 text-indigo-800 ring-indigo-100";
+  if (r === "other") return "bg-amber-50 text-amber-900 ring-amber-100";
+  return "bg-sky-50 text-sky-800 ring-sky-100";
+});
+const roleDotClass = computed(() => {
+  const r = roleKey.value;
+  if (r === "student") return "bg-emerald-500";
+  if (r === "clinician") return "bg-indigo-500";
+  if (r === "other") return "bg-amber-500";
+  return "bg-sky-500";
+});
+
+const headerSubtitle = computed(() => {
+  const r = roleKey.value;
+  if (r === "clinician") return "Review vitals you’ve logged or received (shared workflows coming next).";
+  if (r === "student") return "Track vitals you’ve logged during practice (always follow consent + facility policy).";
+  if (r === "other") return "Browse vitals records saved under this account.";
+  return "Browse and review your previous vitals in one place.";
+});
+
+const addButtonLabel = computed(() => {
+  const r = roleKey.value;
+  if (r === "clinician") return "Log vitals";
+  if (r === "student") return "Log vitals";
+  return "Add vitals";
+});
+
+const emptyState = computed(() => {
+  const r = roleKey.value;
+
+  if (r === "clinician") {
+    return {
+      title: "No vitals records yet.",
+      body: "Start by logging a patient’s vitals (with permission), or use Encounters to document visits while you set up sharing.",
+      primaryCta: "Log first vitals",
+      secondaryTo: { name: "encounters" },
+      secondaryCta: "Go to encounters",
+    };
+  }
+
+  if (r === "student") {
+    return {
+      title: "No vitals logged yet.",
+      body: "Use this area to track vitals you record during posting/practice. Only enter real patient data with consent and your facility’s policy.",
+      primaryCta: "Log first vitals",
+      secondaryTo: { name: "encounters" },
+      secondaryCta: "Create an encounter",
+    };
+  }
+
+  if (r === "other") {
+    return {
+      title: "No records yet.",
+      body: "Records are saved vitals entries. Add one to start building a history you can review later.",
+      primaryCta: "Add first vitals",
+      secondaryTo: { name: "dashboard" },
+      secondaryCta: "Back to dashboard",
+    };
+  }
+
+  // patient / family
+  return {
+    title: "No vitals records yet.",
+    body: "Start by adding your first reading. You can log BP, temperature, heart rate, and notes.",
+    primaryCta: "Add your first vitals",
+    secondaryTo: { name: "support" },
+    secondaryCta: "How to track vitals",
+  };
+});
 
 const totalCount = computed(() => records.value.length);
 
@@ -613,7 +732,6 @@ const dateKey = (ymd) => {
 };
 
 const sortKey = (r) => {
-  // records.js normalizer adds timeMinutes; fall back safely if missing
   return dateKey(r?.date) * 10000 + (Number(r?.timeMinutes) || 0);
 };
 
@@ -623,6 +741,8 @@ const fetchRecords = async () => {
 
   try {
     const user = getLoggedInUser();
+    sessionUser.value = user || null;
+
     if (!user?.id) {
       loadError.value = "You’re not logged in. Please log in again.";
       showToast(loadError.value, "error");
@@ -630,10 +750,8 @@ const fetchRecords = async () => {
       return;
     }
 
-    // ✅ single source of truth (handles list_records.php / fallback)
     const list = await fetchUserRecords(user.id);
 
-    // fetchUserRecords already normalizes and sorts newest-first
     records.value = Array.isArray(list) ? list : [];
 
     if (!records.value.length) selectedId.value = null;
@@ -651,10 +769,8 @@ const fetchRecords = async () => {
 const filteredRecords = computed(() => {
   let list = [...records.value];
 
-  // keep newest-first even after filters/search
   list.sort((a, b) => sortKey(b) - sortKey(a));
 
-  // range filter (date-only)
   if (filterRange.value !== "all") {
     const now = new Date();
     const todayLocal = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -675,24 +791,15 @@ const filteredRecords = computed(() => {
     });
   }
 
-  // session filter
   if (filterSession.value !== "all") {
     const want = sessionKey(filterSession.value);
     list = list.filter((r) => sessionKey(r.session) === want);
   }
 
-  // search filter
   const q = searchQuery.value.trim().toLowerCase();
   if (q) {
     list = list.filter((record) => {
-      const haystack = [
-        record.displayDate,
-        record.date,
-        record.time,
-        record.session,
-        record.symptoms,
-        record.notes,
-      ]
+      const haystack = [record.displayDate, record.date, record.time, record.session, record.symptoms, record.notes]
         .filter(Boolean)
         .join(" ")
         .toLowerCase();
@@ -741,11 +848,7 @@ const copySelectedSummary = async () => {
     ``,
     `Flags: ${
       hasAnyFlags(r)
-        ? [
-            r.flags?.takenMedication ? "Medication taken" : null,
-            r.flags?.fasting ? "Fasting" : null,
-            r.flags?.shareWithClinician ? "Share with clinician" : null,
-          ]
+        ? [r.flags?.takenMedication ? "Medication taken" : null, r.flags?.fasting ? "Fasting" : null, r.flags?.shareWithClinician ? "Share with clinician" : null]
             .filter(Boolean)
             .join(", ")
         : "None"
@@ -767,11 +870,7 @@ const downloadSelectedAsPdf = () => {
 
   const r = selectedRecord.value;
   const flags = hasAnyFlags(r)
-    ? [
-        r.flags?.takenMedication ? "Medication taken" : null,
-        r.flags?.fasting ? "Fasting" : null,
-        r.flags?.shareWithClinician ? "Share with clinician" : null,
-      ]
+    ? [r.flags?.takenMedication ? "Medication taken" : null, r.flags?.fasting ? "Fasting" : null, r.flags?.shareWithClinician ? "Share with clinician" : null]
         .filter(Boolean)
         .join(", ")
     : "None";
