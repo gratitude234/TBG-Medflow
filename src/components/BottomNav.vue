@@ -11,23 +11,23 @@
       </RouterLink>
 
       <RouterLink :to="links.records" class="nav-item" :class="{ active: isActive('/records') }">
-        <span class="icon">🗂️</span>
-        <span class="label">Records</span>
+        <span class="icon">{{ recordsIcon }}</span>
+        <span class="label">{{ recordsLabel }}</span>
       </RouterLink>
 
-      <!-- Center action -->
+      <!-- Center action (role-based) -->
       <RouterLink
-        :to="links.add"
+        :to="center.to"
         class="mx-1 inline-flex h-11 w-11 items-center justify-center rounded-full bg-sky-600 text-white shadow-md shadow-sky-500/25 active:scale-[0.98]"
-        aria-label="Add vitals"
+        :aria-label="center.aria"
+        :title="center.aria"
       >
         <span class="text-xl leading-none">＋</span>
       </RouterLink>
 
-      <!-- ✅ New: Encounters -->
       <RouterLink :to="links.encounters" class="nav-item" :class="{ active: isActive('/encounters') }">
         <span class="icon">📝</span>
-        <span class="label">Notes</span>
+        <span class="label">Encounters</span>
       </RouterLink>
 
       <RouterLink :to="links.profile" class="nav-item" :class="{ active: isActive('/profile') }">
@@ -48,17 +48,33 @@ const props = defineProps({
 
 const route = useRoute();
 
+const normalizedRole = computed(() => String(props.role || "patient").toLowerCase());
+
 const links = computed(() => {
-  // For now: same links for all roles.
-  // Later: split by role (patient vs student/clinician) into different tabs.
   return {
     dashboard: "/dashboard",
-    add: "/add",
     records: "/records",
     encounters: "/encounters",
     profile: "/profile",
   };
 });
+
+const center = computed(() => {
+  const r = normalizedRole.value;
+
+  // Patient: add vitals
+  if (r === "patient") return { to: "/add", aria: "Add vitals" };
+
+  // Student/clinician: default to add encounter (documentation)
+  if (r === "student") return { to: "/encounters/new", aria: "New encounter" };
+  if (r === "clinician") return { to: "/encounters/new", aria: "New note" };
+
+  // Other: keep it safe/simple
+  return { to: "/add", aria: "Add entry" };
+});
+
+const recordsLabel = computed(() => (normalizedRole.value === "clinician" ? "Review" : "Records"));
+const recordsIcon = computed(() => (normalizedRole.value === "clinician" ? "✅" : "🗂️"));
 
 const isActive = (prefix) => route.path === prefix || route.path.startsWith(prefix + "/");
 </script>

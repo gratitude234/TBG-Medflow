@@ -39,8 +39,8 @@
             Welcome back.
           </h1>
           <p class="mt-2 text-[11px] leading-relaxed text-slate-600 sm:text-xs">
-            Log in to view your dashboard, review recent health records and keep practising calm
-            documentation — whether you&apos;re a patient, student nurse or clinician.
+            Log in to view your workspace and continue documentation — whether you&apos;re a patient, student nurse
+            or clinician.
           </p>
 
           <ul class="mt-4 space-y-1.5 text-[11px] text-slate-600">
@@ -96,11 +96,13 @@
           </header>
 
           <form class="mt-4 space-y-4" @submit.prevent="handleSubmit">
-            <!-- Role -->
+            <!-- Role (UI preference only) -->
             <div class="space-y-1">
-              <label class="text-[11px] font-medium text-slate-700">I&apos;m signing in as</label>
+              <label class="text-[11px] font-medium text-slate-700">
+                I&apos;m signing in as <span class="text-slate-400">(optional)</span>
+              </label>
               <select
-                v-model="form.role"
+                v-model="form.roleHint"
                 class="mt-0.5 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-[11px] text-slate-800 shadow-sm focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
               >
                 <option value="patient">Patient / family</option>
@@ -108,7 +110,9 @@
                 <option value="clinician">Clinician / mentor</option>
                 <option value="other">Other</option>
               </select>
-              <p class="mt-1 text-[10px] text-slate-500">This helps tailor the experience to your role.</p>
+              <p class="mt-1 text-[10px] text-slate-500">
+                This only tailors the UI — your actual access is based on your account after sign-in.
+              </p>
             </div>
 
             <!-- Email -->
@@ -215,7 +219,7 @@ const route = useRoute();
 const form = reactive({
   email: "",
   password: "",
-  role: "patient",
+  roleHint: "patient", // UI only
   rememberMe: false,
 });
 
@@ -228,6 +232,18 @@ const toast = reactive({
   type: "info",
   message: "Use the email and password you registered with to sign in.",
 });
+
+function isOnboardingComplete(user) {
+  if (!user?.id) return false;
+  if (user.onboardingComplete === true) return true;
+
+  try {
+    const raw = localStorage.getItem(`medflowOnboardingComplete:${user.id}`);
+    return raw === "1" || raw === "true";
+  } catch {
+    return false;
+  }
+}
 
 const validate = () => {
   errors.email = "";
@@ -259,27 +275,45 @@ const handleSubmit = async () => {
   showToast("info", "Checking your details…");
 
   try {
+    // ✅ Do NOT send role to backend for auth (prevents role mismatch/spoofing)
     const data = await apiPost("login.php", {
       email: form.email,
       password: form.password,
-      // kept for future role-tailoring; backend can ignore
-      role: form.role,
     });
 
     if (!data?.user?.id) throw new Error("Login succeeded but user data is missing.");
 
     // ✅ session source of truth (router guard relies on this)
-    setSessionUser(data.user);
+    const user = { ...data.user };
+
+    // Prefer server role; fallback to hint (UI only)
+    if (!user.role) user.role = form.roleHint;
+
+    setSessionUser(user);
     if (data.token) setSessionToken(data.token);
 
-    // Keep this small preference if you want (optional)
+    // Save UI hint (optional)
+    try {
+      localStorage.setItem("medflowRoleHint", String(form.roleHint || "patient"));
+    } catch {
+      // ignore
+    }
+
+    // Remember me preference (optional)
     if (form.rememberMe) localStorage.setItem("medflowRememberMe", "1");
     else localStorage.removeItem("medflowRememberMe");
 
     showToast("success", "Signed in successfully. Redirecting…");
 
-    const redirect = typeof route.query.redirect === "string" ? route.query.redirect : "/dashboard";
-    router.replace(redirect);
+    const intended = typeof route.query.redirect === "string" ? route.query.redirect : "/dashboard";
+
+    // If not onboarded yet, go onboarding first and preserve the intended destination
+    if (!isOnboardingComplete(user)) {
+      router.replace({ name: "onboarding", query: { redirect: intended } });
+      return;
+    }
+
+    router.replace(intended);
   } catch (err) {
     showToast("error", err?.message || "Login failed. Please try again.");
   } finally {

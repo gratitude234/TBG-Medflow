@@ -14,7 +14,10 @@ import SupportView from "../views/SupportView.vue";
 import LoginView from "../views/auth/LoginView.vue";
 import RegisterView from "../views/auth/RegisterView.vue";
 
-import { isLoggedIn } from "../utils/session";
+// ✅ NEW (you will create this file next)
+import OnboardingView from "../views/auth/OnboardingView.vue";
+
+import { getSessionUser, isLoggedIn } from "../utils/session";
 
 const routes = [
   { path: "/", name: "home", component: HomeView },
@@ -26,6 +29,9 @@ const routes = [
     component: RegisterView,
     alias: "/register",
   },
+
+  // ✅ NEW: Role onboarding (Protected)
+  { path: "/onboarding", name: "onboarding", component: OnboardingView },
 
   // Protected
   { path: "/dashboard", name: "dashboard", component: DashboardView },
@@ -66,17 +72,45 @@ const router = createRouter({
 
 const PUBLIC_NAMES = new Set(["home", "login", "get-started", "about", "support"]);
 
+// While onboarding is incomplete, allow only these (still logged-in)
+const ALLOW_WHILE_ONBOARDING = new Set(["onboarding", "profile", "support", "about"]);
+
+/**
+ * MVP onboarding completion check:
+ * - If your onboarding flow later saves `user.onboardingComplete = true`, we respect that
+ * - Otherwise we check localStorage flag: `medflowOnboardingComplete:<userId>`
+ */
+function isOnboardingComplete(user) {
+  if (!user?.id) return false;
+  if (user.onboardingComplete === true) return true;
+
+  try {
+    const raw = localStorage.getItem(`medflowOnboardingComplete:${user.id}`);
+    return raw === "1" || raw === "true";
+  } catch {
+    return false;
+  }
+}
+
 router.beforeEach((to) => {
   const loggedIn = isLoggedIn();
+  const user = getSessionUser();
+  const onboarded = isOnboardingComplete(user);
 
-  if (loggedIn && (to.name === "login" || to.name === "get-started")) {
-    return { name: "dashboard" };
+  // 1) If NOT logged in: public pages ok; protected -> login
+  if (!loggedIn) {
+    if (PUBLIC_NAMES.has(to.name)) return true;
+    return { name: "login", query: { redirect: to.fullPath } };
   }
 
-  if (PUBLIC_NAMES.has(to.name)) return true;
+  // 2) If logged in and trying to access login/register -> send to right place
+  if (to.name === "login" || to.name === "get-started") {
+    return { name: onboarded ? "dashboard" : "onboarding" };
+  }
 
-  if (!loggedIn) {
-    return { name: "login", query: { redirect: to.fullPath } };
+  // 3) If logged in but NOT onboarded: force to onboarding (except allowed pages)
+  if (!onboarded && !ALLOW_WHILE_ONBOARDING.has(to.name)) {
+    return { name: "onboarding", query: { redirect: to.fullPath } };
   }
 
   return true;

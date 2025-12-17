@@ -56,7 +56,9 @@
             </li>
           </ul>
 
-          <div class="mt-5 inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-[11px] text-emerald-700 ring-1 ring-emerald-100">
+          <div
+            class="mt-5 inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-[11px] text-emerald-700 ring-1 ring-emerald-100"
+          >
             <span class="h-1.5 w-1.5 rounded-full bg-emerald-500" />
             <span>TBG Medflow supports tracking and training — not emergency care.</span>
           </div>
@@ -255,7 +257,7 @@ import logoFull from "../../assets/tbg-medflow-logo-compressed.png";
 import logoMark from "../../assets/tbg-medflow-logo-mark.svg";
 
 import { apiPost } from "../../utils/apiClient";
-import { setSessionUser } from "../../utils/session";
+import { setSessionUser, setSessionToken } from "../../utils/session";
 
 const router = useRouter();
 
@@ -348,9 +350,18 @@ const handleSubmit = async () => {
 
     // ✅ Auto-login after register (best MVP flow)
     if (data?.user?.id) {
-      setSessionUser(data.user);
-      showToast("success", "Account created. Opening your dashboard…");
-      router.replace("/dashboard");
+      // Ensure role exists even if backend doesn’t return it
+      const user = { ...data.user };
+      if (!user.role) user.role = form.role;
+      if (!user.fullName && form.fullName) user.fullName = form.fullName;
+
+      setSessionUser(user);
+      if (data.token) setSessionToken(data.token);
+
+      showToast("success", "Account created. Let’s set up your workspace…");
+
+      // ✅ Go onboarding first (router guard will also enforce this)
+      router.replace({ name: "onboarding", query: { redirect: "/dashboard" } });
       return;
     }
 
