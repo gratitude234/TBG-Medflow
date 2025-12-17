@@ -193,7 +193,6 @@ function loadRoleProfile() {
   if (!user.value?.id) return;
 
   try {
-    // Support either key name (future-proof)
     const raw =
       localStorage.getItem(`medflowRoleProfile:${user.value.id}`) ||
       localStorage.getItem(`medflowProfile:${user.value.id}`) ||
@@ -208,17 +207,24 @@ const roleProfileSummary = computed(() => {
   const p = roleProfile.value;
   if (!p || typeof p !== "object") return [];
 
-  // Render a clean set if present (ignore noisy keys)
   const pick = (label, key) => (p[key] ? { label, value: String(p[key]) } : null);
 
   const rows = [
+    // Student
     pick("Institution", "institution"),
+    pick("Department / Program", "department"), // ✅ NEW
     pick("Level", "level"),
     pick("Posting", "posting"),
+    pick("Mentor email", "mentorEmail"),
+
+    // Clinician
     pick("Facility", "facility"),
     pick("Specialty", "specialty"),
+    pick("Work email", "workEmail"), // ✅ NEW
+
+    // Other
+    pick("Organisation", "organisation"), // ✅ NEW
     pick("Purpose", "purpose"),
-    pick("Mentor email", "mentorEmail"),
   ].filter(Boolean);
 
   return rows;
@@ -238,7 +244,7 @@ const comingSoon = () => {
 onMounted(() => {
   refreshSession();
   window.addEventListener("medflow:session", refreshSession);
-  window.addEventListener("storage", refreshSession); // cross-tab sync
+  window.addEventListener("storage", refreshSession);
 });
 
 onBeforeUnmount(() => {

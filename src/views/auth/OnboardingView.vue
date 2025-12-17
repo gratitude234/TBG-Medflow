@@ -107,8 +107,22 @@
               <p v-if="errors.level" class="text-[10px] text-red-500">{{ errors.level }}</p>
             </div>
 
+            <!-- ✅ NEW: Department/Program -->
             <div class="space-y-1 sm:col-span-2">
-              <label class="text-[11px] font-medium text-slate-700">Clinical posting (optional)</label>
+              <label class="text-[11px] font-medium text-slate-700">
+                Department / Program <span class="text-red-500">*</span>
+              </label>
+              <input
+                v-model="form.department"
+                type="text"
+                class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-[11px] text-slate-900 shadow-sm focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+                placeholder="e.g., Nursing Science"
+              />
+              <p v-if="errors.department" class="text-[10px] text-red-500">{{ errors.department }}</p>
+            </div>
+
+            <div class="space-y-1 sm:col-span-2">
+              <label class="text-[11px] font-medium text-slate-700">Clinical posting location (optional)</label>
               <input
                 v-model="form.posting"
                 type="text"
@@ -118,7 +132,7 @@
             </div>
 
             <div class="space-y-1 sm:col-span-2">
-              <label class="text-[11px] font-medium text-slate-700">Mentor email (optional)</label>
+              <label class="text-[11px] font-medium text-slate-700">Supervisor / Mentor email (optional)</label>
               <input
                 v-model="form.mentorEmail"
                 type="email"
@@ -161,6 +175,17 @@
                 placeholder="e.g., RN, Doctor, Preceptor"
               />
               <p v-if="errors.specialty" class="text-[10px] text-red-500">{{ errors.specialty }}</p>
+            </div>
+
+            <!-- ✅ NEW: Work email (optional) -->
+            <div class="space-y-1 sm:col-span-2">
+              <label class="text-[11px] font-medium text-slate-700">Work email (optional)</label>
+              <input
+                v-model="form.workEmail"
+                type="email"
+                class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-[11px] text-slate-900 shadow-sm focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+                placeholder="e.g., firstname.lastname@hospital.org"
+              />
             </div>
 
             <div class="space-y-1 sm:col-span-2">
@@ -222,6 +247,17 @@
                 placeholder="e.g., Helping a relative track BP"
               />
               <p v-if="errors.purpose" class="text-[10px] text-red-500">{{ errors.purpose }}</p>
+            </div>
+
+            <!-- ✅ NEW: Organisation (optional) -->
+            <div class="space-y-1 sm:col-span-2">
+              <label class="text-[11px] font-medium text-slate-700">Organisation (optional)</label>
+              <input
+                v-model="form.organisation"
+                type="text"
+                class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-[11px] text-slate-900 shadow-sm focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+                placeholder="e.g., NGO / School / Clinic / Company"
+              />
             </div>
           </div>
         </section>
@@ -310,6 +346,7 @@ const toast = reactive({ visible: true, type: "info", message: "Complete setup t
 const form = reactive({
   // Student
   institution: "",
+  department: "", // ✅ NEW
   level: "",
   posting: "",
   mentorEmail: "",
@@ -317,12 +354,14 @@ const form = reactive({
   // Clinician
   facility: "",
   specialty: "",
+  workEmail: "", // ✅ NEW
   verification: "request",
   inviteCode: "",
 
   // Other
   category: "caregiver",
   purpose: "",
+  organisation: "", // ✅ NEW
 
   // Patient minimal
   patientContext: "self",
@@ -330,6 +369,7 @@ const form = reactive({
 
 const errors = reactive({
   institution: "",
+  department: "", // ✅ NEW
   level: "",
   facility: "",
   specialty: "",
@@ -348,6 +388,7 @@ function showToast(type, message) {
 
 function clearErrors() {
   errors.institution = "";
+  errors.department = "";
   errors.level = "";
   errors.facility = "";
   errors.specialty = "";
@@ -360,7 +401,6 @@ function hydrateFromSavedProfile() {
   const saved = getProfile(user.value.id);
   if (!saved) return;
 
-  // Only apply known keys if present
   for (const k of Object.keys(form)) {
     if (saved[k] !== undefined && saved[k] !== null) form[k] = saved[k];
   }
@@ -374,6 +414,7 @@ function validate() {
   if (r === "student") {
     if (!String(form.institution).trim()) errors.institution = "Institution is required.";
     if (!String(form.level).trim()) errors.level = "Level is required.";
+    if (!String(form.department).trim()) errors.department = "Department / Program is required.";
   }
 
   if (r === "clinician") {
@@ -411,10 +452,10 @@ async function submit() {
   try {
     const payload = {
       role: role.value,
-      // Include only relevant fields per role (keep storage clean)
       ...(role.value === "student"
         ? {
             institution: form.institution.trim(),
+            department: form.department.trim(), // ✅ NEW
             level: form.level.trim(),
             posting: form.posting.trim(),
             mentorEmail: form.mentorEmail.trim(),
@@ -423,6 +464,7 @@ async function submit() {
           ? {
               facility: form.facility.trim(),
               specialty: form.specialty.trim(),
+              workEmail: form.workEmail.trim(), // ✅ NEW
               verification: form.verification,
               inviteCode: form.verification === "invite" ? form.inviteCode.trim() : "",
               status: form.verification === "invite" ? "verified-mock" : "pending-mock",
@@ -431,6 +473,7 @@ async function submit() {
             ? {
                 category: form.category,
                 purpose: form.purpose.trim(),
+                organisation: form.organisation.trim(), // ✅ NEW
               }
             : {
                 patientContext: form.patientContext,
@@ -440,7 +483,6 @@ async function submit() {
     saveProfile(user.value.id, payload);
     setOnboardingComplete(user.value.id, true);
 
-    // Update session user object to include onboardingComplete
     setSessionUser({ ...user.value, role: role.value, onboardingComplete: true });
 
     showToast("success", "Setup complete. Redirecting…");
@@ -464,7 +506,6 @@ function skip() {
 
 function reset() {
   for (const k of Object.keys(form)) {
-    // reset to defaults
     if (k === "verification") form[k] = "request";
     else if (k === "category") form[k] = "caregiver";
     else if (k === "patientContext") form[k] = "self";
@@ -478,14 +519,12 @@ onMounted(() => {
   user.value = getSessionUser();
 
   if (!user.value?.id) {
-    // Not logged in: go login and come back here
     router.replace({ name: "login", query: { redirect: "/onboarding" } });
     return;
   }
 
   role.value = normalizeRole(user.value.role);
 
-  // If already onboarded, forward them (prevents loops)
   if (isOnboardingComplete(user.value.id) || user.value.onboardingComplete === true) {
     router.replace(nextPath());
     return;

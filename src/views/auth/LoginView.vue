@@ -219,7 +219,7 @@ const route = useRoute();
 const form = reactive({
   email: "",
   password: "",
-  roleHint: "patient", // UI only
+  roleHint: "patient", // UI only (never used for auth/role assignment)
   rememberMe: false,
 });
 
@@ -283,16 +283,23 @@ const handleSubmit = async () => {
 
     if (!data?.user?.id) throw new Error("Login succeeded but user data is missing.");
 
-    // ✅ session source of truth (router guard relies on this)
+    // ✅ Session source of truth (router guard relies on this)
     const user = { ...data.user };
 
-    // Prefer server role; fallback to hint (UI only)
-    if (!user.role) user.role = form.roleHint;
+    // ✅ IMPORTANT: role must come from account/backend
+    // If backend does not return a role yet, default to "patient" (safe) and warn.
+    if (!user.role) {
+      user.role = "patient";
+      showToast(
+        "info",
+        "Signed in, but your account role wasn’t returned by the server. Defaulting to Patient. (Fix: include role in login response.)"
+      );
+    }
 
     setSessionUser(user);
     if (data.token) setSessionToken(data.token);
 
-    // Save UI hint (optional)
+    // Save UI hint (optional; UI-only preference)
     try {
       localStorage.setItem("medflowRoleHint", String(form.roleHint || "patient"));
     } catch {
@@ -303,7 +310,11 @@ const handleSubmit = async () => {
     if (form.rememberMe) localStorage.setItem("medflowRememberMe", "1");
     else localStorage.removeItem("medflowRememberMe");
 
-    showToast("success", "Signed in successfully. Redirecting…");
+    // If we already showed a warning toast above, don't overwrite instantly.
+    // Otherwise, show success toast.
+    if (toast.type !== "info" || !toast.message.includes("Defaulting to Patient")) {
+      showToast("success", "Signed in successfully. Redirecting…");
+    }
 
     const intended = typeof route.query.redirect === "string" ? route.query.redirect : "/dashboard";
 

@@ -83,11 +83,13 @@
               'bg-sky-50 text-sky-800 ring-1 ring-sky-100': toast.type === 'info',
               'bg-emerald-50 text-emerald-800 ring-1 ring-emerald-100': toast.type === 'success',
               'bg-red-50 text-red-800 ring-1 ring-red-100': toast.type === 'error',
+              'bg-amber-50 text-amber-900 ring-amber-100': toast.type === 'warn',
             }"
           >
             <span v-if="toast.type === 'info'">💬</span>
             <span v-else-if="toast.type === 'success'">✅</span>
-            <span v-else>⚠️</span>
+            <span v-else-if="toast.type === 'warn'">⚠️</span>
+            <span v-else>⛔</span>
             <p class="leading-snug">{{ toast.message }}</p>
           </div>
 
@@ -187,7 +189,7 @@
                 Confirm password <span class="text-red-500">*</span>
               </label>
               <div
-                class="mt-0.5 flex items-center rounded-xl border border-slate-200 bg-white px-3 shadow-sm focus-within:border-sky-500 focus-within:ring-1 focus-within:ring-sky-500"
+                class="mt-0.5 flex items-center rounded-xl border border-slate-200 bg-white px-3 shadow-sm focus-within:border-sky-500 focus-within:ring-1 focus:ring-sky-500"
               >
                 <input
                   id="confirmPassword"
@@ -350,22 +352,31 @@ const handleSubmit = async () => {
 
     // ✅ Auto-login after register (best MVP flow)
     if (data?.user?.id) {
-      // Ensure role exists even if backend doesn’t return it
       const user = { ...data.user };
-      if (!user.role) user.role = form.role;
+
+      // ✅ Role source of truth at signup:
+      // Prefer server role; if server didn't return role, use selected role (signup only).
+      if (!user.role) {
+        user.role = form.role; // allowed at signup
+        showToast(
+          "warn",
+          "Account created. Your role was not returned by the server, so we used your selected role. (Fix: include role in register response.)"
+        );
+      }
+
       if (!user.fullName && form.fullName) user.fullName = form.fullName;
 
       setSessionUser(user);
       if (data.token) setSessionToken(data.token);
 
-      showToast("success", "Account created. Let’s set up your workspace…");
+      // If we showed warning, don't immediately overwrite; otherwise success toast
+      if (toast.type !== "warn") showToast("success", "Account created. Let’s set up your workspace…");
 
       // ✅ Go onboarding first (router guard will also enforce this)
       router.replace({ name: "onboarding", query: { redirect: "/dashboard" } });
       return;
     }
 
-    // If backend doesn’t return user for some reason, fallback to login
     showToast("success", "Account created. Redirecting to login…");
     router.replace("/login");
   } catch (e) {
