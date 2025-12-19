@@ -27,7 +27,7 @@
 
       <RouterLink :to="links.encounters" class="nav-item" :class="{ active: isActive('/encounters') }">
         <span class="icon">📝</span>
-        <span class="label">Encounters</span>
+        <span class="label">Notes</span>
       </RouterLink>
 
       <RouterLink :to="links.profile" class="nav-item" :class="{ active: isActive('/profile') }">
@@ -90,13 +90,13 @@ const center = computed(() => {
   // Student/clinician: add encounter for selected patient (or route to Share to pick)
   if (role.value === "student" || role.value === "clinician") {
     if (activePatientId.value > 0) {
-      return { to: { path: "/encounters/new", query: patientQuery(activePatientId.value) }, aria: "New encounter" };
+      return { to: { path: "/encounters/new", query: patientQuery(activePatientId.value) }, aria: "Add note" };
     }
-    return { to: "/share", aria: "Select patient" };
+    return { to: "/dashboard", aria: "Select patient" };
   }
 
   // Other: safe default
-  return { to: "/share", aria: "Share / monitoring" };
+  return { to: "/dashboard", aria: "Patients" };
 });
 
 const dashboardLabel = computed(() => (isViewer.value ? "Patients" : "Dashboard"));

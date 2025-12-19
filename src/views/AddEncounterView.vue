@@ -7,11 +7,11 @@
           :to="toEncounters"
           class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-[11px] font-medium text-slate-700 hover:bg-slate-50"
         >
-          ← Back to encounters
+          ← Back to notes
         </RouterLink>
 
         <h1 class="mt-3 text-2xl font-semibold tracking-tight text-slate-900">
-          New visit note (SOAP)
+          Add note (SOAP)
         </h1>
         <p class="mt-1 text-[11px] text-slate-600">
           Quick documentation for clinic visits, ward rounds, or supervisor review.
@@ -395,7 +395,7 @@ const submit = async () => {
     };
 
     await createEncounter(payload);
-    showToast("Saved. Your visit note is now in Encounters.", "success");
+    showToast("Saved. Your note is now in Notes.", "success");
     setTimeout(
       () =>
         router.push(
@@ -404,7 +404,7 @@ const submit = async () => {
       500
     );
   } catch (e) {
-    showToast(e?.message || "Failed to save encounter.", "error");
+    showToast(e?.message || "Failed to save note.", "error");
   } finally {
     saving.value = false;
   }

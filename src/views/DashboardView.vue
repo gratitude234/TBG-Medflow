@@ -93,16 +93,16 @@
           <p class="mt-2 text-[11px] text-slate-600">{{ lastEncounterLabel }}</p>
           <div class="mt-4 flex flex-wrap gap-2">
             <RouterLink
-              to="/encounters/new"
+              to="/encounters"
               class="inline-flex items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-xs font-semibold text-white hover:bg-slate-800"
             >
-              ＋ New visit note
+              📝 View notes
             </RouterLink>
             <RouterLink
-              to="/encounters"
+              to="/encounters/new"
               class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
             >
-              View encounters
+              ＋ Add note (optional)
             </RouterLink>
           </div>
         </div>
@@ -230,7 +230,7 @@ import { computed, onMounted, onUnmounted, ref } from "vue";
 import { RouterLink, useRouter } from "vue-router";
 import { getSessionUser } from "../utils/session";
 import { fetchUserRecords } from "../utils/records";
-import { fetchUserEncounters } from "../utils/encounters";
+import { fetchUserNotes } from "../utils/encounters";
 import { normalizeRole, patientQuery, getActivePatient, setActivePatient } from "../utils/patientContext";
 import { listMonitoringPatients } from "../utils/monitoring";
 
@@ -292,7 +292,7 @@ const refreshPatientSummary = async () => {
         lastRecordLabel.value = `Last vitals: ${r.date || "—"} • BP ${r.bpSystolic ?? "—"}/${r.bpDiastolic ?? "—"} • HR ${r.heartRate ?? "—"}`;
       }
 
-      const encounters = await fetchUserEncounters(user.value.id);
+      const encounters = await fetchUserNotes(user.value.id);
       const e = Array.isArray(encounters) ? encounters[0] : null;
       lastEncounterLabel.value = e
         ? `Last note: ${e.date || "—"} • ${e.chiefComplaint || "—"}`

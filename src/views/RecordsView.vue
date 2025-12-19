@@ -56,6 +56,13 @@
           <span class="flex h-4 w-4 items-center justify-center rounded-full bg-sky-500 text-[11px]">＋</span>
           <span>Add vitals</span>
         </RouterLink>
+            <RouterLink
+              v-if="isViewer && context.patientId"
+              :to="toAddNote"
+              class="inline-flex items-center gap-2 rounded-full bg-emerald-600 px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-emerald-700"
+            >
+              📝 Add note
+            </RouterLink>
       </div>
     </header>
 
@@ -244,16 +251,49 @@
         <!-- Empty -->
         <div
           v-else-if="!totalCount"
-          class="mt-6 rounded-2xl bg-slate-50 px-4 py-6 text-center text-xs text-slate-500"
+          class="mt-6 rounded-2xl bg-slate-50 px-4 py-6 text-center text-xs text-slate-600"
         >
-          <p>No records yet.</p>
-          <RouterLink
-            :to="toAddVitals"
-            class="mt-3 inline-flex items-center justify-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-[11px] font-semibold text-white shadow-sm hover:bg-slate-800"
-          >
-            <span>＋</span>
-            <span>Add your first vitals</span>
-          </RouterLink>
+          <p v-if="isViewer && !context.patientId">No patient selected.</p>
+          <p v-else-if="isViewer">No vitals yet for this patient.</p>
+          <p v-else>No records yet.</p>
+
+          <div class="mt-3 flex flex-wrap justify-center gap-2">
+            <RouterLink
+              v-if="isViewer && !context.patientId"
+              to="/dashboard"
+              class="inline-flex items-center justify-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-[11px] font-semibold text-white shadow-sm hover:bg-slate-800"
+            >
+              Select patient
+            </RouterLink>
+
+            <RouterLink
+              v-else-if="isViewer"
+              :to="toAddNote"
+              class="inline-flex items-center justify-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-[11px] font-semibold text-white shadow-sm hover:bg-slate-800"
+            >
+              ＋ Add note
+            </RouterLink>
+
+            <RouterLink
+              v-else
+              :to="toAddVitals"
+              class="inline-flex items-center justify-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-[11px] font-semibold text-white shadow-sm hover:bg-slate-800"
+            >
+              ＋ Add your first vitals
+            </RouterLink>
+
+            <RouterLink
+              v-if="isViewer && context.patientId"
+              :to="backToDashboard"
+              class="inline-flex items-center justify-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-[11px] font-semibold text-slate-700 hover:bg-slate-50"
+            >
+              Back to patients
+            </RouterLink>
+          </div>
+
+          <p v-if="isViewer && context.patientId" class="mt-2 text-[11px] text-slate-500">
+            Tip: You can still add a note even if no vitals exist yet.
+          </p>
         </div>
 
         <!-- No matches -->
@@ -577,6 +617,13 @@ const toAddVitals = computed(() => {
   if (isViewer.value && pid <= 0) return { path: "/share" };
   return isViewer.value && pid > 0 ? { path: "/add", query: patientQuery(pid) } : { path: "/add" };
 });
+
+const toAddNote = computed(() => {
+  const pid = Number(context.value.patientId || 0);
+  if (isViewer.value && pid <= 0) return { path: "/dashboard" };
+  return isViewer.value && pid > 0 ? { path: "/encounters/new", query: patientQuery(pid) } : { path: "/encounters/new" };
+});
+
 
 const pageTitle = computed(() => {
   if (!isViewer.value) return "Records";

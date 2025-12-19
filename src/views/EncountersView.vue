@@ -2,16 +2,16 @@
   <main class="mx-auto max-w-6xl px-4 pb-10 pt-4 space-y-6 sm:pt-6 lg:pt-8">
     <section class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
       <div>
-        <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Encounters</h1>
+        <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Notes</h1>
         <p class="mt-1 text-[11px] text-slate-600">
-          Visit notes (SOAP) for documentation and review.
+          Optional notes (SOAP) for documentation and review.
         </p>
         <p v-if="isViewer && context.patientId" class="mt-2 text-[11px] text-slate-500">
-          Viewing patient:
+          Patient:
           <span class="font-medium text-slate-700">{{ context.patientName || ('Patient #' + context.patientId) }}</span>
         </p>
         <p v-if="isViewer && !context.patientId" class="mt-2 text-[11px] text-slate-500">
-          Select a patient first (Share &amp; Monitoring).
+          Select a patient first (Dashboard → Monitoring patients).
         </p>
       </div>
 
@@ -20,7 +20,7 @@
           :to="toNewEncounter"
           class="inline-flex items-center gap-2 rounded-full bg-sky-600 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-sky-700"
         >
-          ＋ New visit note
+          ＋ Add note
         </RouterLink>
 
         <button
