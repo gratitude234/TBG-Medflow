@@ -50,6 +50,14 @@ export const fetchUserEncounters = async (userId) => {
   return raw.map(normalizeEncounter).filter((x) => x?.id != null && x?.date);
 };
 
+/**
+ * ✅ FIX: DashboardView expects fetchUserNotes from this module.
+ * We'll alias notes to encounters (lightweight layer).
+ */
+export const fetchUserNotes = async (userId) => {
+  return fetchUserEncounters(userId);
+};
+
 export const createEncounter = async (payload) => {
   const data = await apiPost("add_encounter.php", payload);
   if (!data?.success) throw new Error(data?.error || "Failed to save encounter");
