@@ -111,7 +111,7 @@
                 <option value="other">Other</option>
               </select>
               <p class="mt-1 text-[10px] text-slate-500">
-                This only tailors the UI — your access is based on your account after sign-in.
+                This only tailors the UI — your actual access is based on your account after sign-in.
               </p>
             </div>
 
@@ -210,9 +210,8 @@ import { useRouter, useRoute, RouterLink } from "vue-router";
 import logoFull from "../../assets/tbg-medflow-logo-compressed.png";
 import logoMark from "../../assets/tbg-medflow-logo-mark.svg";
 
-import { loginAccount } from "../../services/auth";
+import { apiPost } from "../../utils/apiClient";
 import { setSessionUser, setSessionToken } from "../../utils/session";
-import { isOnboardingComplete as isOnboardingCompleteForUser } from "../../utils/profile";
 
 const router = useRouter();
 const route = useRoute();
@@ -223,13 +222,6 @@ const form = reactive({
   roleHint: "patient", // UI only (never used for auth/role assignment)
   rememberMe: false,
 });
-
-try {
-  const hint = localStorage.getItem("medflowRoleHint");
-  if (hint) form.roleHint = String(hint);
-} catch {
-  // ignore
-}
 
 const errors = reactive({ email: "", password: "" });
 const isSubmitting = ref(false);
@@ -244,8 +236,10 @@ const toast = reactive({
 function isOnboardingComplete(user) {
   if (!user?.id) return false;
   if (user.onboardingComplete === true) return true;
+
   try {
-    return isOnboardingCompleteForUser(user.id) === true;
+    const raw = localStorage.getItem(`medflowOnboardingComplete:${user.id}`);
+    return raw === "1" || raw === "true";
   } catch {
     return false;
   }
@@ -282,22 +276,23 @@ const handleSubmit = async () => {
 
   try {
     // ✅ Do NOT send role to backend for auth (prevents role mismatch/spoofing)
-    const data = await loginAccount({
+    const data = await apiPost("login.php", {
       email: form.email,
       password: form.password,
     });
 
     if (!data?.user?.id) throw new Error("Login succeeded but user data is missing.");
 
+    // ✅ Session source of truth (router guard relies on this)
     const user = { ...data.user };
 
     // ✅ IMPORTANT: role must come from account/backend
-    // If backend/local store does not return a role, default to patient (safe) and warn.
+    // If backend does not return a role yet, default to "patient" (safe) and warn.
     if (!user.role) {
       user.role = "patient";
       showToast(
         "info",
-        "Signed in, but your account role wasn’t found. Defaulting to Patient. (Fix: include role in login response.)"
+        "Signed in, but your account role wasn’t returned by the server. Defaulting to Patient. (Fix: include role in login response.)"
       );
     }
 
@@ -315,6 +310,12 @@ const handleSubmit = async () => {
     if (form.rememberMe) localStorage.setItem("medflowRememberMe", "1");
     else localStorage.removeItem("medflowRememberMe");
 
+    // If we already showed a warning toast above, don't overwrite instantly.
+    // Otherwise, show success toast.
+    if (toast.type !== "info" || !toast.message.includes("Defaulting to Patient")) {
+      showToast("success", "Signed in successfully. Redirecting…");
+    }
+
     const intended = typeof route.query.redirect === "string" ? route.query.redirect : "/dashboard";
 
     // If not onboarded yet, go onboarding first and preserve the intended destination
@@ -323,7 +324,6 @@ const handleSubmit = async () => {
       return;
     }
 
-    showToast("success", "Signed in successfully. Redirecting…");
     router.replace(intended);
   } catch (err) {
     showToast("error", err?.message || "Login failed. Please try again.");

@@ -6,11 +6,18 @@
         <p class="mt-1 text-[11px] text-slate-600">
           Visit notes (SOAP) for documentation and review.
         </p>
+        <p v-if="isViewer && context.patientId" class="mt-2 text-[11px] text-slate-500">
+          Viewing patient:
+          <span class="font-medium text-slate-700">{{ context.patientName || ('Patient #' + context.patientId) }}</span>
+        </p>
+        <p v-if="isViewer && !context.patientId" class="mt-2 text-[11px] text-slate-500">
+          Select a patient first (Share &amp; Monitoring).
+        </p>
       </div>
 
       <div class="flex flex-wrap gap-2">
         <RouterLink
-          to="/encounters/new"
+          :to="toNewEncounter"
           class="inline-flex items-center gap-2 rounded-full bg-sky-600 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-sky-700"
         >
           ＋ New visit note
@@ -155,12 +162,42 @@
 </template>
 
 <script setup>
-import { computed, onMounted, reactive, ref } from "vue";
-import { RouterLink, useRouter } from "vue-router";
+import { computed, onMounted, onUnmounted, reactive, ref, watch } from "vue";
+import { RouterLink, useRouter, useRoute } from "vue-router";
 import { getSessionUser } from "../utils/session";
 import { fetchUserEncounters } from "../utils/encounters";
+import { getTargetPatientMeta, normalizeRole, patientQuery } from "../utils/patientContext";
 
 const router = useRouter();
+const route = useRoute();
+
+// Reactive session user
+const currentUser = ref(getSessionUser());
+const syncUser = () => (currentUser.value = getSessionUser());
+
+const role = computed(() => normalizeRole(currentUser.value?.role));
+const isViewer = computed(() => role.value !== "patient");
+
+// Template expects patientId/patientName
+const context = computed(() => {
+  const m = getTargetPatientMeta({ user: currentUser.value, route });
+  return {
+    patientId: m?.id || null,
+    patientName: m?.fullName || "",
+    patientEmail: m?.email || "",
+  };
+});
+
+const targetUserId = computed(() => {
+  if (!currentUser.value?.id) return 0;
+  return role.value === "patient" ? Number(currentUser.value.id) : Number(context.value.patientId || 0);
+});
+
+const toNewEncounter = computed(() => {
+  if (role.value === "patient") return "/encounters/new";
+  if (context.value.patientId) return { path: "/encounters/new", query: patientQuery(context.value.patientId) };
+  return "/share";
+});
 
 const loading = ref(false);
 const error = ref("");
@@ -195,6 +232,7 @@ const badgeClass = (s) => {
   return "bg-slate-50 text-slate-700 ring-slate-100";
 };
 
+
 const filtered = computed(() => {
   const needle = q.value.trim().toLowerCase();
   return encounters.value.filter((e) => {
@@ -209,16 +247,23 @@ const filtered = computed(() => {
 const select = (e) => (selected.value = e);
 
 const load = async () => {
-  const user = getSessionUser();
+  const user = currentUser.value || getSessionUser();
   if (!user?.id) {
     router.push("/login");
+    return;
+  }
+
+  const pid = role.value === "patient" ? Number(user.id) : Number(context.value?.patientId || 0);
+  if (role.value !== "patient" && pid <= 0) {
+    showToast("Select a patient first (Share & Monitoring).", "error");
+    router.push("/share");
     return;
   }
 
   loading.value = true;
   error.value = "";
   try {
-    const list = await fetchUserEncounters(user.id);
+    const list = await fetchUserEncounters(pid);
     encounters.value = Array.isArray(list) ? list : [];
     selected.value = encounters.value[0] || null;
   } catch (e) {
@@ -304,5 +349,20 @@ const printPdf = () => {
   w.print();
 };
 
-onMounted(load);
+onMounted(() => {
+  syncUser();
+  window.addEventListener("medflow:session", syncUser);
+  load();
+});
+
+onUnmounted(() => {
+  window.removeEventListener("medflow:session", syncUser);
+});
+
+watch(
+  () => String(route.query.patientUserId || "") + "|" + String(context.value?.patientId || ""),
+  () => {
+    if (role.value !== "patient") load();
+  }
+);
 </script>

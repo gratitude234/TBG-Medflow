@@ -7,7 +7,7 @@
         <!-- Left -->
         <div>
           <RouterLink
-            to="/dashboard"
+            :to="backToDashboard"
             class="inline-flex items-center gap-2 rounded-full bg-white/80 px-3 py-1.5 text-[11px] font-medium text-slate-600 shadow-sm ring-1 ring-slate-200 transition hover:bg-slate-50 hover:text-slate-900"
           >
             <span class="text-sm">←</span>
@@ -29,6 +29,34 @@
               Log vitals in calm steps. You can leave fields blank if you didn’t measure them.
               <span class="font-medium">At least one vital is required</span>.
             </p>
+
+            <!-- Monitoring context (clinician/student) -->
+            <div v-if="context.isViewer" class="mt-3 rounded-2xl border border-slate-200 bg-slate-50 p-3">
+              <div v-if="context.patientId" class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <p class="text-[11px] text-slate-700">
+                  You’re logging vitals for
+                  <span class="font-semibold text-slate-900">{{ context.patientName || ('Patient #' + context.patientId) }}</span>.
+                </p>
+                <RouterLink
+                  to="/share"
+                  class="inline-flex w-fit items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-[11px] font-semibold text-slate-700 hover:bg-slate-50"
+                >
+                  Switch patient
+                </RouterLink>
+              </div>
+
+              <div v-else class="text-[11px] text-amber-900">
+                No patient selected. Go to <span class="font-semibold">Share &amp; Monitoring</span> to select a patient first.
+                <div class="mt-2">
+                  <RouterLink
+                    to="/share"
+                    class="inline-flex items-center gap-2 rounded-full bg-slate-900 px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-slate-800"
+                  >
+                    Open Monitoring
+                  </RouterLink>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -45,7 +73,7 @@
           </div>
 
           <RouterLink
-            to="/records"
+            :to="toRecords"
             class="inline-flex items-center justify-center gap-2 rounded-full border border-slate-300 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 shadow-sm transition hover:border-sky-500 hover:text-sky-600"
           >
             <span>📋</span>
@@ -338,7 +366,7 @@
 
               <div class="flex flex-wrap items-center gap-3 sm:justify-end">
                 <RouterLink
-                  to="/dashboard"
+                  :to="backToDashboard"
                   class="text-xs font-medium text-slate-500 underline-offset-4 hover:text-slate-700 hover:underline"
                 >
                   Cancel
@@ -346,10 +374,11 @@
 
                 <button
                   type="submit"
-                  :disabled="saving"
+                  :disabled="saving || !canActOnPatient"
                   class="inline-flex items-center justify-center gap-2 rounded-full bg-sky-600 px-5 py-2 text-xs font-semibold text-white shadow-sm shadow-sky-500/30 hover:bg-sky-700 disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  <span v-if="!saving">Save vitals</span>
+                  <span v-if="!saving && canActOnPatient">Save vitals</span>
+                  <span v-else-if="!saving && !canActOnPatient">Select a patient first</span>
                   <span v-else>Saving…</span>
                 </button>
               </div>
@@ -495,13 +524,38 @@
 </template>
 
 <script setup>
-import { computed, onMounted, reactive, ref } from "vue";
-import { useRouter, RouterLink } from "vue-router";
+import { computed, onMounted, onUnmounted, reactive, ref } from "vue";
+import { useRouter, useRoute, RouterLink } from "vue-router";
 
 import { apiPost } from "../utils/apiClient";
 import { fetchUserRecords, getLoggedInUser } from "../utils/records";
+import { getTargetPatientMeta, normalizeRole, patientQuery } from "../utils/patientContext";
 
 const router = useRouter();
+const route = useRoute();
+
+// Keep user reactive (so UI updates on login/logout without refresh)
+const currentUser = ref(getLoggedInUser());
+const syncUser = () => (currentUser.value = getLoggedInUser());
+
+const role = computed(() => normalizeRole(currentUser.value?.role));
+const isViewer = computed(() => role.value !== "patient");
+const context = computed(() => getTargetPatientMeta({ user: currentUser.value, route }));
+
+const canActOnPatient = computed(() => {
+  if (!currentUser.value?.id) return false;
+  return role.value === "patient" ? true : !!context.value?.id;
+});
+
+const backToDashboard = computed(() => {
+  const pid = Number(context.value?.id || 0);
+  return pid > 0 && isViewer.value ? { path: "/dashboard", query: patientQuery(pid) } : "/dashboard";
+});
+
+const toRecords = computed(() => {
+  const pid = Number(context.value?.id || 0);
+  return pid > 0 && isViewer.value ? { path: "/records", query: patientQuery(pid) } : "/records";
+});
 
 const toast = reactive({ visible: false, type: "info", message: "", _t: null });
 const showToast = (message, type = "info", ms = 2600) => {
@@ -572,12 +626,17 @@ const validate = () => {
 
 const loadLastRecord = async () => {
   try {
-    const user = getLoggedInUser();
+    const user = currentUser.value || getLoggedInUser();
+    const pid = role.value === "patient" ? Number(user?.id || 0) : Number(context.value?.id || 0);
     if (!user?.id) {
       lastRecordLabel.value = "Not logged in";
       return;
     }
-    const list = await fetchUserRecords(user.id);
+    if (role.value !== "patient" && pid <= 0) {
+      lastRecordLabel.value = "Select a patient";
+      return;
+    }
+    const list = await fetchUserRecords(pid);
     const r = list[0];
     lastRecordLabel.value = r ? `${r.displayDate} • ${r.time}` : "No records yet";
   } catch {
@@ -602,8 +661,19 @@ const handleSubmit = async () => {
   showToast("Saving vitals…", "info");
 
   try {
+    const pid = role.value === "patient" ? Number(user.id) : Number(context.value?.id || 0);
+    if (role.value !== "patient" && pid <= 0) {
+      showToast("Select a patient first.", "error");
+      router.push("/share");
+      return;
+    }
+
     await apiPost("add_record.php", {
-      userId: user.id,
+      // Always send the patient id as userId (backend stores vitals by user_id)
+      userId: pid,
+      // Backend can ignore these for now; later use to enforce access control
+      viewerUserId: Number(user.id),
+      viewerRole: role.value,
       date: form.date,
       time: form.time || null,
       session: form.session || null,
@@ -623,7 +693,7 @@ const handleSubmit = async () => {
     });
 
     showToast("Vitals saved successfully.", "success", 1600);
-    router.push("/records");
+    router.push(role.value === "patient" ? "/records" : { path: "/records", query: patientQuery(pid) });
   } catch (e) {
     showToast(e?.message || "Failed to save vitals.", "error");
   } finally {
@@ -656,6 +726,12 @@ const previewDateLabel = computed(() => {
 
 onMounted(() => {
   setNow();
+  syncUser();
+  window.addEventListener("medflow:session", syncUser);
   loadLastRecord();
+});
+
+onUnmounted(() => {
+  window.removeEventListener("medflow:session", syncUser);
 });
 </script>

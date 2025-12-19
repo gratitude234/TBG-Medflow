@@ -127,9 +127,7 @@
                   <option value="clinician">Clinician / mentor</option>
                   <option value="other">Other</option>
                 </select>
-                <p class="mt-1 text-[10px] text-slate-500">
-                  This is saved on your account and used after sign-in (no role picker at login).
-                </p>
+                <p class="mt-1 text-[10px] text-slate-500">This helps tailor the experience to your role.</p>
               </div>
             </div>
 
@@ -191,7 +189,7 @@
                 Confirm password <span class="text-red-500">*</span>
               </label>
               <div
-                class="mt-0.5 flex items-center rounded-xl border border-slate-200 bg-white px-3 shadow-sm focus-within:border-sky-500 focus:ring-1 focus:ring-sky-500"
+                class="mt-0.5 flex items-center rounded-xl border border-slate-200 bg-white px-3 shadow-sm focus-within:border-sky-500 focus-within:ring-1 focus:ring-sky-500"
               >
                 <input
                   id="confirmPassword"
@@ -260,7 +258,7 @@ import { useRouter, RouterLink } from "vue-router";
 import logoFull from "../../assets/tbg-medflow-logo-compressed.png";
 import logoMark from "../../assets/tbg-medflow-logo-mark.svg";
 
-import { registerAccount } from "../../services/auth";
+import { apiPost } from "../../utils/apiClient";
 import { setSessionUser, setSessionToken } from "../../utils/session";
 
 const router = useRouter();
@@ -345,19 +343,21 @@ const handleSubmit = async () => {
   showToast("info", "Creating your account…");
 
   try {
-    const data = await registerAccount({
+    const data = await apiPost("register.php", {
       fullName: form.fullName,
       email: form.email,
       password: form.password,
       role: form.role,
     });
 
+    // ✅ Auto-login after register (best MVP flow)
     if (data?.user?.id) {
       const user = { ...data.user };
 
-      // Signup is the only moment we’re allowed to fallback to selected role.
+      // ✅ Role source of truth at signup:
+      // Prefer server role; if server didn't return role, use selected role (signup only).
       if (!user.role) {
-        user.role = form.role;
+        user.role = form.role; // allowed at signup
         showToast(
           "warn",
           "Account created. Your role was not returned by the server, so we used your selected role. (Fix: include role in register response.)"
@@ -369,8 +369,10 @@ const handleSubmit = async () => {
       setSessionUser(user);
       if (data.token) setSessionToken(data.token);
 
+      // If we showed warning, don't immediately overwrite; otherwise success toast
       if (toast.type !== "warn") showToast("success", "Account created. Let’s set up your workspace…");
 
+      // ✅ Go onboarding first (router guard will also enforce this)
       router.replace({ name: "onboarding", query: { redirect: "/dashboard" } });
       return;
     }

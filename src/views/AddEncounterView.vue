@@ -4,7 +4,7 @@
     <section class="flex items-start justify-between gap-4">
       <div>
         <RouterLink
-          to="/encounters"
+          :to="toEncounters"
           class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-[11px] font-medium text-slate-700 hover:bg-slate-50"
         >
           ← Back to encounters
@@ -16,6 +16,34 @@
         <p class="mt-1 text-[11px] text-slate-600">
           Quick documentation for clinic visits, ward rounds, or supervisor review.
         </p>
+
+        <!-- Monitoring context -->
+        <div v-if="isViewer" class="mt-3 rounded-2xl border border-slate-200 bg-slate-50 p-3">
+          <div v-if="context.patientId" class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <p class="text-[11px] text-slate-700">
+              Writing note for
+              <span class="font-semibold text-slate-900">{{ context.patientName || ('Patient #' + context.patientId) }}</span>.
+            </p>
+            <RouterLink
+              to="/share"
+              class="inline-flex w-fit items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-[11px] font-semibold text-slate-700 hover:bg-slate-50"
+            >
+              Switch patient
+            </RouterLink>
+          </div>
+
+          <div v-else class="text-[11px] text-amber-900">
+            No patient selected. Go to <span class="font-semibold">Share &amp; Monitoring</span> and select a patient first.
+            <div class="mt-2">
+              <RouterLink
+                to="/share"
+                class="inline-flex items-center gap-2 rounded-full bg-slate-900 px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-slate-800"
+              >
+                Open Monitoring
+              </RouterLink>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="hidden sm:block rounded-2xl bg-slate-900 px-4 py-3 text-[11px] text-slate-100">
@@ -224,12 +252,36 @@
 </template>
 
 <script setup>
-import { computed, onMounted, reactive, ref } from "vue";
-import { RouterLink, useRouter } from "vue-router";
+import { computed, onMounted, onUnmounted, reactive, ref } from "vue";
+import { RouterLink, useRouter, useRoute } from "vue-router";
 import { getSessionUser } from "../utils/session";
 import { createEncounter } from "../utils/encounters";
+import { getTargetPatientMeta, normalizeRole, patientQuery } from "../utils/patientContext";
 
 const router = useRouter();
+const route = useRoute();
+
+// Reactive session user
+const currentUser = ref(getSessionUser());
+const syncUser = () => (currentUser.value = getSessionUser());
+
+const role = computed(() => normalizeRole(currentUser.value?.role));
+const isViewer = computed(() => role.value !== "patient");
+
+// Shape expected by the existing template (patientId/patientName)
+const context = computed(() => {
+  const m = getTargetPatientMeta({ user: currentUser.value, route });
+  return {
+    patientId: m?.id || null,
+    patientName: m?.fullName || "",
+    patientEmail: m?.email || "",
+  };
+});
+
+const toEncounters = computed(() => {
+  const pid = Number(context.value?.patientId || 0);
+  return isViewer.value && pid > 0 ? { path: "/encounters", query: patientQuery(pid) } : "/encounters";
+});
 
 const saving = ref(false);
 const toast = reactive({ visible: false, type: "info", message: "", _t: null });
@@ -306,7 +358,7 @@ const previewWhen = computed(() => {
 const submit = async () => {
   if (!validate()) return;
 
-  const user = getSessionUser();
+  const user = currentUser.value || getSessionUser();
   if (!user?.id) {
     router.push("/login");
     return;
@@ -314,10 +366,19 @@ const submit = async () => {
 
   saving.value = true;
   try {
+    const patientId = role.value === "patient" ? Number(user.id) : Number(context.value?.patientId || 0);
+    if (role.value !== "patient" && patientId <= 0) {
+      showToast("Select a patient first.", "error");
+      router.push("/share");
+      return;
+    }
+
     const payload = {
-      userId: user.id,
-      authorUserId: user.id,
-      authorRole: user.role || "patient",
+      // Backward/forward compatible (backend accepts userId OR patientUserId)
+      userId: patientId,
+      patientUserId: patientId,
+      authorUserId: Number(user.id),
+      authorRole: role.value,
 
       date: form.date,
       time: form.time || null,
@@ -335,7 +396,13 @@ const submit = async () => {
 
     await createEncounter(payload);
     showToast("Saved. Your visit note is now in Encounters.", "success");
-    setTimeout(() => router.push("/encounters"), 500);
+    setTimeout(
+      () =>
+        router.push(
+          role.value === "patient" ? "/encounters" : { path: "/encounters", query: patientQuery(patientId) }
+        ),
+      500
+    );
   } catch (e) {
     showToast(e?.message || "Failed to save encounter.", "error");
   } finally {
@@ -343,5 +410,13 @@ const submit = async () => {
   }
 };
 
-onMounted(() => setNow());
+onMounted(() => {
+  syncUser();
+  window.addEventListener("medflow:session", syncUser);
+  setNow();
+});
+
+onUnmounted(() => {
+  window.removeEventListener("medflow:session", syncUser);
+});
 </script>

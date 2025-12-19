@@ -1,7 +1,4 @@
 // src/utils/apiClient.js
-// Optional refactor: unified error handling + easy remote/local switch
-
-import { getSessionToken } from "./session";
 
 const RAW_BASE =
   import.meta.env.VITE_API_BASE ||
@@ -10,101 +7,45 @@ const RAW_BASE =
 // Ensure trailing slash
 const API_BASE = RAW_BASE.endsWith("/") ? RAW_BASE : RAW_BASE + "/";
 
-/**
- * If you want a pure local/dev mode (no network), set:
- *   VITE_USE_REMOTE_API=0
- * or reuse:
- *   VITE_USE_REMOTE_AUTH=0
- */
-const USE_REMOTE_API = String(
-  import.meta.env.VITE_USE_REMOTE_API ??
-    import.meta.env.VITE_USE_REMOTE_AUTH ??
-    "1"
-).trim() !== "0";
-
-function buildUrl(path) {
-  return API_BASE + String(path || "").replace(/^\/+/, "");
-}
-
-function normalizeErrorMessage(data, res) {
-  const serverMsg =
-    (data && (data.error || data.message)) ||
-    (typeof data === "string" ? data : "");
-  if (serverMsg) return String(serverMsg);
-
-  if (res) return `Request failed (${res.status})`;
-  return "Request failed";
-}
-
-async function parseResponse(res) {
-  const contentType = (res.headers.get("content-type") || "").toLowerCase();
-  const text = await res.text();
-
-  // Try JSON first if content-type hints it, otherwise attempt anyway
-  if (contentType.includes("application/json")) {
-    try {
-      return text ? JSON.parse(text) : null;
-    } catch {
-      return { success: false, error: "Invalid JSON from server" };
-    }
-  }
-
-  // Non-JSON: attempt JSON parse; fallback to text
+function getToken() {
   try {
-    return text ? JSON.parse(text) : null;
+    return localStorage.getItem("medflowToken") || "";
   } catch {
-    return text ? { success: false, error: text } : null;
+    return "";
   }
 }
 
-async function request(path, options = {}, { throwOnSuccessFalse = true } = {}) {
-  if (!USE_REMOTE_API) {
-    throw new Error("Remote API is disabled (set VITE_USE_REMOTE_API=1 to enable).");
-  }
+async function request(path, options = {}) {
+  const url = API_BASE + path.replace(/^\/+/, "");
 
-  const url = buildUrl(path);
-
-  const token = getSessionToken();
+  const token = getToken();
   const headers = {
-    Accept: "application/json",
     ...(options.headers || {}),
   };
-
-  // Auto attach JSON header if body is object and content-type is missing
-  const hasBody = options.body !== undefined && options.body !== null;
-  const hasContentType = Object.keys(headers).some(
-    (k) => k.toLowerCase() === "content-type"
-  );
-  if (hasBody && !hasContentType && typeof options.body === "string") {
-    // caller set string body; do nothing
-  }
 
   // Attach Authorization if token exists
   if (token && !headers.Authorization) {
     headers.Authorization = `Bearer ${token}`;
   }
 
-  let res;
+  const res = await fetch(url, {
+    mode: "cors",
+    ...options,
+    headers,
+  });
+
+  const text = await res.text();
+  let data = null;
+
   try {
-    res = await fetch(url, {
-      mode: "cors",
-      ...options,
-      headers,
-    });
-  } catch (e) {
-    throw new Error(e?.message || "Network error. Check your connection / API URL.");
+    data = text ? JSON.parse(text) : null;
+  } catch {
+    data = { success: false, error: text || "Non-JSON response from server" };
   }
 
-  const data = await parseResponse(res);
-
-  // Non-2xx
   if (!res.ok) {
-    throw new Error(normalizeErrorMessage(data, res));
-  }
-
-  // 2xx but backend says success:false (common PHP style)
-  if (throwOnSuccessFalse && data && typeof data === "object" && data.success === false) {
-    throw new Error(normalizeErrorMessage(data, res));
+    const msg = data?.error || `Request failed (${res.status})`;
+    throw new Error(msg);
   }
 
   return data;
@@ -120,8 +61,4 @@ export async function apiPost(path, body) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body ?? {}),
   });
-}
-
-export async function apiDelete(path) {
-  return request(path, { method: "DELETE" });
 }
