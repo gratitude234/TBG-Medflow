@@ -186,6 +186,7 @@ const navLinks = computed(() => {
     { label: "Records", to: "/records" },
     { label: "Encounters", to: "/encounters" },
     { label: "Share", to: "/share" },
+    { label: "Inbox", to: "/inbox" },
     { label: "Profile", to: "/profile" },
   ];
 

@@ -18,6 +18,134 @@
       </RouterLink>
     </section>
 
+    <!-- ✅ Option B: Secure Share (Care Team) -->
+    <section v-if="role === 'patient'" class="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h2 class="text-base font-bold text-slate-900">Secure share (Verified care team)</h2>
+          <p class="mt-1 text-[11px] text-slate-600">
+            Select a verified clinician/student nurse. They get notified and can reply in your Inbox.
+          </p>
+        </div>
+
+        <RouterLink
+          to="/inbox"
+          class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+        >
+          Open Inbox →
+        </RouterLink>
+      </div>
+
+      <div class="mt-4 grid gap-3 lg:grid-cols-2">
+        <!-- Search & add -->
+        <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+          <p class="text-[11px] font-semibold text-slate-700">Find verified staff</p>
+          <div class="mt-2 flex gap-2">
+            <input
+              v-model="staffQuery"
+              @input="runStaffSearch"
+              type="search"
+              class="flex-1 rounded-2xl border border-slate-200 bg-white px-3 py-2 text-[12px] text-slate-900 outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500"
+              placeholder="Search by name or email…"
+            />
+            <button
+              class="rounded-2xl bg-sky-600 px-4 py-2 text-xs font-semibold text-white hover:bg-sky-700 disabled:opacity-60"
+              :disabled="staffLoading || !staffQuery.trim()"
+              @click="runStaffSearch"
+            >
+              {{ staffLoading ? "…" : "Search" }}
+            </button>
+          </div>
+
+          <div class="mt-3 space-y-2">
+            <div v-if="staffResults.length === 0" class="text-[11px] text-slate-600">
+              Type to search verified clinicians/student nurses.
+            </div>
+
+            <div
+              v-for="s in staffResults"
+              :key="s.id"
+              class="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white px-3 py-3"
+            >
+              <div class="min-w-0">
+                <p class="truncate text-[12px] font-semibold text-slate-900">{{ s.fullName || "Staff" }}</p>
+                <p class="truncate text-[11px] text-slate-600">{{ s.email }}</p>
+              </div>
+              <button
+                class="rounded-full bg-slate-900 px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-slate-800 disabled:opacity-60"
+                :disabled="staffLoading"
+                @click="addToCareTeam(s.id)"
+              >
+                Add
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Care team -->
+        <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+          <p class="text-[11px] font-semibold text-slate-700">Your care team</p>
+
+          <p v-if="careError" class="mt-2 text-[11px] text-red-600">{{ careError }}</p>
+          <p v-if="careToast" class="mt-2 text-[11px] text-emerald-700">{{ careToast }}</p>
+
+          <div v-if="careLoading" class="mt-3 text-[11px] text-slate-600">Loading…</div>
+
+          <div v-else class="mt-3 space-y-2">
+            <div v-if="careTeam.length === 0" class="text-[11px] text-slate-600">
+              No care team yet. Add a verified staff member above.
+            </div>
+
+            <div
+              v-for="m in careTeam"
+              :key="m.viewerUserId"
+              class="rounded-2xl border border-slate-200 bg-white px-3 py-3"
+            >
+              <div class="flex items-start justify-between gap-3">
+                <div class="min-w-0">
+                  <p class="truncate text-[12px] font-semibold text-slate-900">{{ m.staff?.fullName || "Staff" }}</p>
+                  <p class="truncate text-[11px] text-slate-600">{{ m.staff?.email }}</p>
+                </div>
+
+                <div class="flex flex-wrap justify-end gap-2">
+                  <button
+                    class="rounded-full bg-sky-600 px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-sky-700 disabled:opacity-60"
+                    :disabled="sharingTo === m.viewerUserId"
+                    @click="shareLatestTo(m.viewerUserId)"
+                  >
+                    {{ sharingTo === m.viewerUserId ? "Sharing…" : "Share latest" }}
+                  </button>
+
+                  <button
+                    class="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-[11px] font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60"
+                    :disabled="!m.threadId"
+                    @click="openChat(m.threadId)"
+                  >
+                    Chat
+                  </button>
+
+                  <button
+                    class="rounded-full border border-rose-200 bg-rose-50 px-3 py-1.5 text-[11px] font-semibold text-rose-700 hover:bg-rose-100 disabled:opacity-60"
+                    :disabled="revokingTo === m.viewerUserId"
+                    @click="revokeMember(m.viewerUserId)"
+                  >
+                    {{ revokingTo === m.viewerUserId ? "…" : "Revoke" }}
+                  </button>
+                </div>
+              </div>
+
+              <p v-if="m.threadId && m.lastMessagePreview" class="mt-2 line-clamp-2 text-[11px] text-slate-600">
+                {{ m.lastMessagePreview }}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Option A (legacy): Share code monitoring -->
+
+
     <!-- Not logged in -->
     <section v-if="!user" class="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
       <div class="rounded-2xl bg-amber-50 p-4 text-[11px] text-amber-900">
@@ -269,10 +397,14 @@
 
 <script setup>
 import { computed, onMounted, reactive, ref } from "vue";
+import { useRouter } from "vue-router";
 import { RouterLink } from "vue-router";
+import { searchVerifiedStaff, addCareMember, listCareTeam, shareRecord, revokeCareMember } from "../utils/careTeam";
 import { getSessionUser } from "../utils/session";
 import { createShareInvite, acceptShareInvite, listMonitoringPatients } from "../utils/monitoring";
 import { getActivePatient, setActivePatient, normalizeRole } from "../utils/patientContext";
+
+const router = useRouter();
 
 const user = ref(null);
 const role = computed(() => normalizeRole(user.value?.role));
@@ -321,6 +453,7 @@ onMounted(async () => {
   activePatientId.value = active?.id ? Number(active.id) : null;
 
   await refreshPatients();
+  await loadCareTeam();
 });
 
 const refreshPatients = async () => {
@@ -376,6 +509,7 @@ const handleAcceptInvite = async () => {
     accept.code = "";
     showToast("Access added. Loading your monitoring list…", "success");
     await refreshPatients();
+  await loadCareTeam();
   } catch (e) {
     showToast(e?.message || "Could not accept code.", "error");
   } finally {

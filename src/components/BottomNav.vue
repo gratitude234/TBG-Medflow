@@ -30,6 +30,11 @@
         <span class="label">Notes</span>
       </RouterLink>
 
+
+      <RouterLink :to="links.inbox" class="nav-item" :class="{ active: isActive('/inbox') }">
+        <span class="icon">💬</span>
+        <span class="label">Inbox</span>
+      </RouterLink>
       <RouterLink :to="links.profile" class="nav-item" :class="{ active: isActive('/profile') }">
         <span class="icon">👤</span>
         <span class="label">Profile</span>
@@ -79,6 +84,7 @@ const links = computed(() => {
     dashboard: "/dashboard",
     records: withPatient("/records"),
     encounters: withPatient("/encounters"),
+    inbox: "/inbox",
     profile: "/profile",
   };
 });

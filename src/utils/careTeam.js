@@ -28,7 +28,8 @@ export async function addCareMember(viewerUserId) {
 export async function listCareTeam() {
   const data = await apiGet("list_care_team.php");
   if (!data?.success) throw new Error(data?.error || "Failed to load care team");
-  const members = Array.isArray(data.members) ? data.members : [];
+  const raw = Array.isArray(data.members) ? data.members : Array.isArray(data.careTeam) ? data.careTeam : [];
+  const members = raw;
   return members.map((m) => ({
     grantId: Number(m.grantId ?? m.grant_id ?? 0) || null,
     viewerUserId: Number(m.viewerUserId ?? m.viewer_user_id ?? 0) || null,
@@ -49,4 +50,13 @@ export async function shareRecord({ viewerUserId, recordId = null, note = "" }) 
     recordId: Number(data.recordId ?? 0) || null,
     threadId: Number(data.threadId ?? 0) || null,
   };
+}
+
+
+export async function revokeCareMember(viewerUserId) {
+  const id = Number(viewerUserId || 0);
+  if (!id) throw new Error("Invalid staff member");
+  const data = await apiPost("revoke_care_member.php", { viewerUserId: id });
+  if (!data?.success) throw new Error(data?.error || "Failed to revoke access");
+  return data;
 }

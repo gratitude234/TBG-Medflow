@@ -8,6 +8,8 @@ import RecordsView from "../views/RecordsView.vue";
 import EncountersView from "../views/EncountersView.vue";
 import AddEncounterView from "../views/AddEncounterView.vue";
 import ShareView from "../views/ShareView.vue";
+import InboxView from "../views/InboxView.vue";
+import ThreadView from "../views/ThreadView.vue";
 import ProfileView from "../views/ProfileView.vue";
 import AdminVerificationView from "../views/admin/AdminVerificationView.vue";
 import AboutView from "../views/AboutView.vue";
@@ -57,6 +59,8 @@ const routes = [
   },
 
   { path: "/share", name: "share", component: ShareView },
+  { path: "/inbox", name: "inbox", component: InboxView },
+  { path: "/inbox/:threadId", name: "thread", component: ThreadView, props: true },
   { path: "/profile", name: "profile", component: ProfileView },
 
   // Admin
