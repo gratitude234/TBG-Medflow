@@ -78,11 +78,23 @@ import { computed, onMounted, ref, watch, nextTick } from "vue";
 import { useRoute, RouterLink } from "vue-router";
 
 import { getSessionUser } from "../utils/session";
+import { normalizeRole } from "../utils/patientContext";
 import { getMessages, sendMessage, markThreadRead } from "../utils/inbox";
 
 const route = useRoute();
 
 const me = computed(() => getSessionUser());
+const role = computed(() => normalizeRole(me.value?.role));
+const verificationStatus = computed(() => String(me.value?.verification_status || me.value?.verificationStatus || "").toLowerCase());
+
+// Staff must be verified before messaging patients
+const blocked = computed(() => {
+  if (role.value === "clinician" || role.value === "student") {
+    return verificationStatus.value !== "verified";
+  }
+  return false;
+});
+
 const threadId = computed(() => Number(route.params.threadId || 0));
 
 const loading = ref(true);
@@ -117,8 +129,19 @@ const scrollToBottom = async () => {
 };
 
 const load = async () => {
-  sessionUser.value = getSessionUser();
-  if (blocked.value) { messages.value = []; headerTitle.value = ''; return; }
+  if (!threadId.value) {
+    messages.value = [];
+    headerTitle.value = "Conversation";
+    loading.value = false;
+    return;
+  }
+
+  if (blocked.value) {
+    messages.value = [];
+    headerTitle.value = "Conversation";
+    loading.value = false;
+    return;
+  }
 
   error.value = "";
   hint.value = "";
@@ -130,11 +153,7 @@ const load = async () => {
     messages.value = Array.isArray(data?.messages) ? data.messages : [];
 
     // best-effort mark as read
-    try {
-      await markThreadRead(threadId.value);
-    } catch {
-      // ignore
-    }
+    await markThreadRead(threadId.value);
 
     await scrollToBottom();
   } catch (e) {
@@ -153,7 +172,7 @@ const send = async () => {
   hint.value = "";
 
   try {
-    await sendMessage(threadId.value, body);
+    await sendMessage({ threadId: threadId.value, body });
     draft.value = "";
     await load();
   } catch (e) {

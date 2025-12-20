@@ -261,6 +261,12 @@
 
         <!-- CLINICIAN/STUDENT/OTHER: accept -->
         <div v-else class="mt-5 space-y-4">
+          <div v-if="acceptBlocked" class="rounded-2xl border border-amber-200 bg-amber-50 p-3 text-[11px] text-amber-900">
+            Your account must be <span class="font-semibold">verified</span> before you can accept patient share codes.
+            <div class="mt-2">
+              <RouterLink to="/profile" class="inline-flex rounded-full bg-amber-600 px-4 py-2 text-xs font-semibold text-white hover:bg-amber-700">Open Profile</RouterLink>
+            </div>
+          </div>
           <div>
             <label class="text-xs font-medium text-slate-700">Share code</label>
             <input
@@ -277,7 +283,7 @@
             <button
               type="button"
               class="inline-flex items-center gap-2 rounded-full bg-sky-600 px-4 py-2 text-xs font-semibold text-white shadow-sm shadow-sky-500/20 hover:bg-sky-700 disabled:opacity-60"
-              :disabled="busy || !accept.code.trim()"
+              :disabled="busy || !accept.code.trim() || acceptBlocked"
               @click="handleAcceptInvite"
             >
               {{ busy ? 'Saving…' : 'Accept & add patient' }}
@@ -397,8 +403,8 @@
 
 <script setup>
 import { computed, onMounted, reactive, ref } from "vue";
-import { useRouter } from "vue-router";
-import { RouterLink } from "vue-router";
+import { useRouter, RouterLink } from "vue-router";
+
 import { searchVerifiedStaff, addCareMember, listCareTeam, shareRecord, revokeCareMember } from "../utils/careTeam";
 import { getSessionUser } from "../utils/session";
 import { createShareInvite, acceptShareInvite, listMonitoringPatients } from "../utils/monitoring";
@@ -408,12 +414,23 @@ const router = useRouter();
 
 const user = ref(null);
 const role = computed(() => normalizeRole(user.value?.role));
+const verificationStatus = computed(() => String(user.value?.verification_status || user.value?.verificationStatus || "").toLowerCase());
+
+const acceptBlocked = computed(() => {
+  // Staff must be verified before accepting share codes (backend also enforces for messaging)
+  if (role.value === "clinician" || role.value === "student") {
+    return verificationStatus.value !== "verified";
+  }
+  return false;
+});
+
 const roleLabel = computed(() => {
   if (role.value === "student") return "Student nurse";
   if (role.value === "clinician") return "Clinician / mentor";
   if (role.value === "other") return "Other";
   return "Patient / family";
 });
+
 const roleDot = computed(() => {
   if (role.value === "patient") return "bg-emerald-500";
   if (role.value === "clinician") return "bg-sky-500";
@@ -432,38 +449,29 @@ const showToast = (message, type = "info", ms = 2600) => {
 
 const busy = ref(false);
 
-// Patient invite state
+// ---------------------------
+// OPTION A: Share code (patient creates; staff accepts)
+// ---------------------------
 const invite = reactive({ allowedRole: "clinician", expiresInDays: 7 });
 const inviteResult = reactive({ code: "", expiresAt: null });
 
-// Viewer accept state
 const accept = reactive({ code: "" });
 const acceptResult = ref(null);
 
-// Monitoring list
+// Staff monitoring list (right panel)
 const patients = ref([]);
 const patientsLoading = ref(false);
 const activePatientId = ref(null);
 
-onMounted(async () => {
-  user.value = getSessionUser();
-  if (!user.value?.id) return;
-
-  const active = getActivePatient(user.value.id);
-  activePatientId.value = active?.id ? Number(active.id) : null;
-
-  await refreshPatients();
-  await loadCareTeam();
-});
-
 const refreshPatients = async () => {
   if (!user.value?.id) return;
-  const r = role.value;
-  if (r === "patient") return;
+  if (role.value === "patient") return;
 
   patientsLoading.value = true;
   try {
-    patients.value = await listMonitoringPatients(user.value.id);
+    const list = await listMonitoringPatients(user.value.id);
+    patients.value = Array.isArray(list) ? list : [];
+
     // If active selection is missing, set first
     if (!activePatientId.value && patients.value?.[0]?.id) {
       selectPatient(patients.value[0]);
@@ -477,16 +485,18 @@ const refreshPatients = async () => {
 
 const handleCreateInvite = async () => {
   if (!user.value?.id) return;
+  if (role.value !== "patient") return;
+
   busy.value = true;
   inviteResult.code = "";
   inviteResult.expiresAt = null;
 
   try {
     const res = await createShareInvite({
-      patientUserId: user.value.id,
       allowedRole: invite.allowedRole,
       expiresInDays: invite.expiresInDays,
     });
+
     inviteResult.code = res.code;
     inviteResult.expiresAt = res.expiresAt;
     showToast("Share code generated.", "success");
@@ -499,17 +509,23 @@ const handleCreateInvite = async () => {
 
 const handleAcceptInvite = async () => {
   if (!user.value?.id) return;
+  if (role.value === "patient") return;
+
+  if (acceptBlocked.value) {
+    showToast("Verification required: open Profile to request verification.", "error");
+    return;
+  }
+
   const code = accept.code.trim();
   if (!code) return;
 
   busy.value = true;
   acceptResult.value = null;
   try {
-    acceptResult.value = await acceptShareInvite({ code, viewerUserId: user.value.id });
+    acceptResult.value = await acceptShareInvite({ code });
     accept.code = "";
     showToast("Access added. Loading your monitoring list…", "success");
     await refreshPatients();
-  await loadCareTeam();
   } catch (e) {
     showToast(e?.message || "Could not accept code.", "error");
   } finally {
@@ -532,4 +548,139 @@ const copy = async (text) => {
     showToast("Could not copy. Select the text and copy manually.", "error");
   }
 };
+
+// ---------------------------
+// OPTION B: Secure care team (patient picks verified staff)
+// ---------------------------
+const staffQuery = ref("");
+const staffResults = ref([]);
+const staffLoading = ref(false);
+let staffTimer = null;
+
+const careTeam = ref([]);
+const careLoading = ref(false);
+const careError = ref("");
+const careToast = ref("");
+
+const sharingTo = ref(null);
+const revokingTo = ref(null);
+
+const loadCareTeam = async () => {
+  if (!user.value?.id) return;
+  if (role.value !== "patient") return;
+
+  careLoading.value = true;
+  careError.value = "";
+  try {
+    const list = await listCareTeam();
+    careTeam.value = Array.isArray(list) ? list : [];
+  } catch (e) {
+    careError.value = e?.message || "Failed to load care team";
+  } finally {
+    careLoading.value = false;
+  }
+};
+
+const runStaffSearch = () => {
+  if (role.value !== "patient") return;
+
+  if (staffTimer) clearTimeout(staffTimer);
+  staffTimer = setTimeout(async () => {
+    const q = String(staffQuery.value || "").trim();
+    if (q.length < 2) {
+      staffResults.value = [];
+      return;
+    }
+
+    staffLoading.value = true;
+    try {
+      const results = await searchVerifiedStaff(q);
+      const existing = new Set((careTeam.value || []).map((m) => Number(m.viewerUserId)));
+      staffResults.value = (results || []).filter((u) => u?.id && !existing.has(Number(u.id)));
+    } catch (e) {
+      staffResults.value = [];
+      showToast(e?.message || "Search failed", "error");
+    } finally {
+      staffLoading.value = false;
+    }
+  }, 350);
+};
+
+const addToCareTeam = async (viewerUserId) => {
+  if (!viewerUserId) return;
+  staffLoading.value = true;
+
+  try {
+    const res = await addCareMember(viewerUserId);
+    careToast.value = "Member added. They’ve been notified.";
+    showToast("Care team updated.", "success");
+    staffQuery.value = "";
+    staffResults.value = [];
+    await loadCareTeam();
+
+    // If backend created a chat thread, optionally open it
+    if (res?.threadId) {
+      // don’t force navigation; just keep for quick access
+    }
+  } catch (e) {
+    showToast(e?.message || "Could not add member", "error");
+  } finally {
+    staffLoading.value = false;
+  }
+};
+
+const shareLatestTo = async (viewerUserId) => {
+  const id = Number(viewerUserId || 0);
+  if (!id) return;
+  sharingTo.value = id;
+
+  try {
+    const res = await shareRecord({ viewerUserId: id, recordId: null, note: "" });
+    showToast("Shared your latest record.", "success");
+    if (res?.threadId) {
+      // Optional: keep a hint for the user
+    }
+  } catch (e) {
+    showToast(e?.message || "Could not share record", "error");
+  } finally {
+    sharingTo.value = null;
+  }
+};
+
+const openChat = (threadId) => {
+  const id = Number(threadId || 0);
+  if (!id) return;
+  router.push({ name: "thread", params: { threadId: String(id) } });
+};
+
+const revokeMember = async (viewerUserId) => {
+  const id = Number(viewerUserId || 0);
+  if (!id) return;
+  revokingTo.value = id;
+
+  try {
+    await revokeCareMember(id);
+    careToast.value = "Access revoked.";
+    showToast("Access revoked.", "success");
+    await loadCareTeam();
+  } catch (e) {
+    showToast(e?.message || "Could not revoke access", "error");
+  } finally {
+    revokingTo.value = null;
+  }
+};
+
+onMounted(async () => {
+  user.value = getSessionUser();
+  if (!user.value?.id) return;
+
+  const active = getActivePatient(user.value.id);
+  activePatientId.value = active?.id ? Number(active.id) : null;
+
+  if (role.value === "patient") {
+    await loadCareTeam();
+  } else {
+    await refreshPatients();
+  }
+});
 </script>

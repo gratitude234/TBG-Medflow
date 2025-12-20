@@ -20,3 +20,8 @@ export async function markNotificationsRead({ ids, all } = {}) {
   if (!data?.success) throw new Error(data?.error || "Failed to mark as read");
   return data;
 }
+
+// Convenience + backward compatibility (InboxView.vue uses this name)
+export async function markAllNotificationsRead() {
+  return markNotificationsRead({ all: true });
+}

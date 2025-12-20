@@ -29,14 +29,24 @@ export async function listCareTeam() {
   const data = await apiGet("list_care_team.php");
   if (!data?.success) throw new Error(data?.error || "Failed to load care team");
   const raw = Array.isArray(data.members) ? data.members : Array.isArray(data.careTeam) ? data.careTeam : [];
-  const members = raw;
-  return members.map((m) => ({
-    grantId: Number(m.grantId ?? m.grant_id ?? 0) || null,
-    viewerUserId: Number(m.viewerUserId ?? m.viewer_user_id ?? 0) || null,
-    viewerRole: String(m.viewerRole ?? m.viewer_role ?? "").toLowerCase(),
-    threadId: Number(m.threadId ?? m.thread_id ?? 0) || null,
-    staff: normalizeUser(m.staff || m),
-  }));
+
+  return raw
+    .map((m) => {
+      const staff = normalizeUser(m.staff || m);
+      return {
+        grantId: Number(m.grantId ?? m.grant_id ?? 0) || null,
+        viewerUserId: Number(m.viewerUserId ?? m.viewer_user_id ?? 0) || null,
+        viewerRole: String(m.viewerRole ?? m.viewer_role ?? staff.role ?? "").toLowerCase(),
+        status: String(m.status ?? "active").toLowerCase(),
+
+        threadId: Number(m.threadId ?? m.thread_id ?? 0) || null,
+        lastMessageAt: m.lastMessageAt ?? m.last_message_at ?? null,
+        lastMessagePreview: String(m.lastMessagePreview ?? m.last_message_preview ?? ""),
+
+        staff,
+      };
+    })
+    .filter((x) => x.viewerUserId && x.staff?.id);
 }
 
 export async function shareRecord({ viewerUserId, recordId = null, note = "" }) {
@@ -51,7 +61,6 @@ export async function shareRecord({ viewerUserId, recordId = null, note = "" }) 
     threadId: Number(data.threadId ?? 0) || null,
   };
 }
-
 
 export async function revokeCareMember(viewerUserId) {
   const id = Number(viewerUserId || 0);
