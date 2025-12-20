@@ -16,7 +16,7 @@ function getToken() {
 }
 
 async function request(path, options = {}) {
-  const url = API_BASE + path.replace(/^\/+/, "");
+  const url = API_BASE + String(path || "").replace(/^\/+/, "");
 
   const token = getToken();
   const headers = {
@@ -43,6 +43,12 @@ async function request(path, options = {}) {
     data = { success: false, error: text || "Non-JSON response from server" };
   }
 
+  // ✅ NEW: Treat API-level failures as errors even if HTTP status is 200
+  if (data && typeof data === "object" && "success" in data && data.success === false) {
+    throw new Error(data.error || "Request failed");
+  }
+
+  // HTTP-level failure
   if (!res.ok) {
     const msg = data?.error || `Request failed (${res.status})`;
     throw new Error(msg);

@@ -92,6 +92,77 @@
           </p>
         </div>
 
+        <!-- Verification (student/clinician) -->
+        <div v-if="isStaff" class="rounded-2xl border border-slate-200 p-4">
+          <div class="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h2 class="text-sm font-semibold text-slate-900">Staff verification</h2>
+              <p class="mt-1 text-[11px] text-slate-600">
+                Student nurses and clinicians must be verified before they can receive shares and reply to patients.
+              </p>
+            </div>
+
+            <span
+              class="inline-flex items-center gap-1 rounded-full px-2 py-1 text-[11px] font-semibold ring-1"
+              :class="verificationBadgeClass"
+            >
+              <span class="h-1.5 w-1.5 rounded-full" :class="verificationDotClass" />
+              {{ verificationLabel }}
+            </span>
+          </div>
+
+          <div class="mt-4 grid gap-3 sm:grid-cols-2">
+            <div class="space-y-1 sm:col-span-2">
+              <label class="text-[11px] font-medium text-slate-700">Short note (optional)</label>
+              <input
+                v-model="verifyForm.note"
+                type="text"
+                class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-[11px] text-slate-900 shadow-sm focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+                placeholder="e.g., JABU student nurse, posting at OAUTHC"
+              />
+            </div>
+
+            <div class="space-y-1 sm:col-span-2">
+              <label class="text-[11px] font-medium text-slate-700">Proof link (optional)</label>
+              <input
+                v-model="verifyForm.documentUrl"
+                type="url"
+                class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-[11px] text-slate-900 shadow-sm focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+                placeholder="Google Drive / PDF link (optional)"
+              />
+              <p class="mt-1 text-[10px] text-slate-500">
+                You can paste a link to your hospital ID card photo, posting letter, or school ID.
+              </p>
+            </div>
+          </div>
+
+          <div class="mt-4 flex flex-wrap gap-2">
+            <button
+              type="button"
+              class="rounded-full bg-sky-600 px-4 py-2 text-xs font-semibold text-white shadow-sm shadow-sky-500/25 hover:bg-sky-700 disabled:cursor-not-allowed disabled:opacity-60"
+              :disabled="verificationStatus === 'verified' || submittingVerification"
+              @click="submitVerification"
+            >
+              <span v-if="verificationStatus === 'verified'">Verified</span>
+              <span v-else-if="submittingVerification">Sending…</span>
+              <span v-else>Request verification</span>
+            </button>
+
+            <button
+              type="button"
+              class="rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60"
+              :disabled="refreshingMe"
+              @click="refreshMe"
+            >
+              {{ refreshingMe ? "Refreshing…" : "Refresh status" }}
+            </button>
+          </div>
+
+          <p v-if="verifyMessage" class="mt-3 text-[11px]" :class="verifyMessageType === 'error' ? 'text-red-600' : 'text-emerald-700'">
+            {{ verifyMessage }}
+          </p>
+        </div>
+
         <!-- Actions -->
         <div class="flex flex-wrap gap-2">
           <button
@@ -155,7 +226,8 @@
 <script setup>
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import { RouterLink, useRouter } from "vue-router";
-import { clearSession, getSessionUser } from "../utils/session";
+import { apiGet, apiPost } from "../utils/apiClient";
+import { clearSession, getSessionUser, setSessionUser } from "../utils/session";
 
 const router = useRouter();
 const user = ref(null);
@@ -229,6 +301,102 @@ const roleProfileSummary = computed(() => {
 
   return rows;
 });
+
+// --------------------------------------------------
+// Verification (staff)
+// --------------------------------------------------
+const isStaff = computed(() => {
+  const r = String(user.value?.role || "").toLowerCase();
+  return r === "student" || r === "clinician";
+});
+
+const verificationStatus = computed(() => {
+  return String(user.value?.verificationStatus || "unverified").toLowerCase();
+});
+
+const verificationLabel = computed(() => {
+  const s = verificationStatus.value;
+  if (s === "verified") return "Verified";
+  if (s === "pending") return "Pending";
+  if (s === "rejected") return "Rejected";
+  return "Unverified";
+});
+
+const verificationBadgeClass = computed(() => {
+  const s = verificationStatus.value;
+  if (s === "verified") return "bg-emerald-50 text-emerald-800 ring-emerald-100";
+  if (s === "pending") return "bg-amber-50 text-amber-800 ring-amber-100";
+  if (s === "rejected") return "bg-rose-50 text-rose-800 ring-rose-100";
+  return "bg-slate-50 text-slate-700 ring-slate-200";
+});
+
+const verificationDotClass = computed(() => {
+  const s = verificationStatus.value;
+  if (s === "verified") return "bg-emerald-500";
+  if (s === "pending") return "bg-amber-500";
+  if (s === "rejected") return "bg-rose-500";
+  return "bg-slate-400";
+});
+
+const verifyForm = ref({ note: "", documentUrl: "" });
+const submittingVerification = ref(false);
+const refreshingMe = ref(false);
+const verifyMessage = ref("");
+const verifyMessageType = ref("success");
+
+const refreshMe = async () => {
+  if (!user.value?.id) return;
+  refreshingMe.value = true;
+  verifyMessage.value = "";
+  try {
+    const data = await apiGet("me.php");
+    if (data?.user?.id) {
+      // merge to keep any local flags intact
+      const merged = { ...user.value, ...data.user };
+      user.value = merged;
+      setSessionUser(merged);
+    }
+  } catch (e) {
+    verifyMessageType.value = "error";
+    verifyMessage.value = e?.message || "Could not refresh.";
+  } finally {
+    refreshingMe.value = false;
+  }
+};
+
+const submitVerification = async () => {
+  if (!user.value?.id) return;
+  if (!isStaff.value) return;
+
+  submittingVerification.value = true;
+  verifyMessage.value = "";
+
+  try {
+    const payload = {
+      note: verifyForm.value.note,
+      documentUrl: verifyForm.value.documentUrl,
+      details: roleProfile.value || null,
+    };
+
+    await apiPost("submit_verification_request.php", payload);
+
+    verifyMessageType.value = "success";
+    verifyMessage.value = "Verification request sent. We'll update your status after review.";
+
+    // optimistic update
+    const merged = { ...user.value, verificationStatus: "pending" };
+    user.value = merged;
+    setSessionUser(merged);
+
+    // fetch canonical status
+    await refreshMe();
+  } catch (e) {
+    verifyMessageType.value = "error";
+    verifyMessage.value = e?.message || "Could not submit request.";
+  } finally {
+    submittingVerification.value = false;
+  }
+};
 
 const logout = () => {
   clearSession();

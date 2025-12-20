@@ -9,6 +9,7 @@ import EncountersView from "../views/EncountersView.vue";
 import AddEncounterView from "../views/AddEncounterView.vue";
 import ShareView from "../views/ShareView.vue";
 import ProfileView from "../views/ProfileView.vue";
+import AdminVerificationView from "../views/admin/AdminVerificationView.vue";
 import AboutView from "../views/AboutView.vue";
 import SupportView from "../views/SupportView.vue";
 import LoginView from "../views/auth/LoginView.vue";
@@ -18,6 +19,7 @@ import RegisterView from "../views/auth/RegisterView.vue";
 import OnboardingView from "../views/auth/OnboardingView.vue";
 
 import { getSessionUser, isLoggedIn } from "../utils/session";
+import { isAdmin } from "../utils/admin";
 
 const routes = [
   { path: "/", name: "home", component: HomeView },
@@ -56,6 +58,14 @@ const routes = [
 
   { path: "/share", name: "share", component: ShareView },
   { path: "/profile", name: "profile", component: ProfileView },
+
+  // Admin
+  {
+    path: "/admin/verification",
+    name: "admin_verification",
+    component: AdminVerificationView,
+    meta: { requiresAdmin: true },
+  },
 
   // Public
   { path: "/about", name: "about", component: AboutView },
@@ -111,6 +121,11 @@ router.beforeEach((to) => {
   // 3) If logged in but NOT onboarded: force to onboarding (except allowed pages)
   if (!onboarded && !ALLOW_WHILE_ONBOARDING.has(to.name)) {
     return { name: "onboarding", query: { redirect: to.fullPath } };
+  }
+
+  // 4) Admin routes
+  if (to.meta?.requiresAdmin && !isAdmin(user)) {
+    return { name: "dashboard" };
   }
 
   return true;

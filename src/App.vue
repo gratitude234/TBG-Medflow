@@ -152,6 +152,7 @@ import logoMark from "./assets/tbg-medflow-logo-mark.svg";
 
 import BottomNav from "./components/BottomNav.vue";
 import { clearSession, getSessionUser } from "./utils/session";
+import { isAdmin } from "./utils/admin";
 
 const router = useRouter();
 const route = useRoute();
@@ -179,7 +180,7 @@ const navLinks = computed(() => {
   }
 
   // Logged-in nav (now includes Encounters)
-  return [
+  const links = [
     { label: "Dashboard", to: "/dashboard" },
     { label: "Add Vitals", to: "/add" },
     { label: "Records", to: "/records" },
@@ -187,6 +188,12 @@ const navLinks = computed(() => {
     { label: "Share", to: "/share" },
     { label: "Profile", to: "/profile" },
   ];
+
+  if (isAdmin(sessionUser.value)) {
+    links.splice(links.length - 1, 0, { label: "Verify Staff", to: "/admin/verification" });
+  }
+
+  return links;
 });
 
 const handleScroll = () => {
