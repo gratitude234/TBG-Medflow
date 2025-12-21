@@ -12,7 +12,7 @@
 
       <RouterLink
         to="/dashboard"
-        class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+        class="btn-outline"
       >
         ← Back to dashboard
       </RouterLink>
@@ -30,7 +30,7 @@
 
         <RouterLink
           to="/inbox"
-          class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+          class="btn-outline"
         >
           Open Inbox →
         </RouterLink>
@@ -45,11 +45,11 @@
               v-model="staffQuery"
               @input="runStaffSearch"
               type="search"
-              class="flex-1 rounded-2xl border border-slate-200 bg-white px-3 py-2 text-[12px] text-slate-900 outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500"
+              class="input"
               placeholder="Search by name or email…"
             />
             <button
-              class="rounded-2xl bg-sky-600 px-4 py-2 text-xs font-semibold text-white hover:bg-sky-700 disabled:opacity-60"
+              class="btn-primary rounded-2xl px-4 py-2"
               :disabled="staffLoading || !staffQuery.trim()"
               @click="runStaffSearch"
             >
@@ -72,7 +72,7 @@
                 <p class="truncate text-[11px] text-slate-600">{{ s.email }}</p>
               </div>
               <button
-                class="rounded-full bg-slate-900 px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-slate-800 disabled:opacity-60"
+                class="btn-dark px-3 py-1.5 text-[11px]"
                 :disabled="staffLoading"
                 @click="addToCareTeam(s.id)"
               >
@@ -109,7 +109,7 @@
 
                 <div class="flex flex-wrap justify-end gap-2">
                   <button
-                    class="rounded-full bg-sky-600 px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-sky-700 disabled:opacity-60"
+                    class="btn-primary px-3 py-1.5 text-[11px]"
                     :disabled="sharingTo === m.viewerUserId"
                     @click="shareLatestTo(m.viewerUserId)"
                   >
@@ -117,7 +117,7 @@
                   </button>
 
                   <button
-                    class="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-[11px] font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60"
+                    class="btn-outline px-3 py-1.5 text-[11px]"
                     :disabled="!m.threadId"
                     @click="openChat(m.threadId)"
                   >
@@ -125,7 +125,7 @@
                   </button>
 
                   <button
-                    class="rounded-full border border-rose-200 bg-rose-50 px-3 py-1.5 text-[11px] font-semibold text-rose-700 hover:bg-rose-100 disabled:opacity-60"
+                    class="btn-danger px-3 py-1.5 text-[11px]"
                     :disabled="revokingTo === m.viewerUserId"
                     @click="revokeMember(m.viewerUserId)"
                   >
@@ -192,7 +192,7 @@
               <label class="text-xs font-medium text-slate-700">Who can use this code?</label>
               <select
                 v-model="invite.allowedRole"
-                class="mt-1.5 w-full rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs outline-none focus:border-sky-400 focus:bg-white focus:ring-2 focus:ring-sky-100"
+                class="select mt-1.5"
               >
                 <option value="clinician">Clinician / mentor</option>
                 <option value="student">Student nurse</option>
@@ -204,7 +204,7 @@
               <label class="text-xs font-medium text-slate-700">Expires in</label>
               <select
                 v-model.number="invite.expiresInDays"
-                class="mt-1.5 w-full rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs outline-none focus:border-sky-400 focus:bg-white focus:ring-2 focus:ring-sky-100"
+                class="select mt-1.5"
               >
                 <option :value="1">24 hours</option>
                 <option :value="3">3 days</option>
@@ -227,7 +227,7 @@
 
             <RouterLink
               to="/records"
-              class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
+              class="btn-outline"
             >
               View my records
             </RouterLink>

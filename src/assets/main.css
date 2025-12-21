@@ -6,26 +6,140 @@
   body {
     @apply bg-slate-50 text-slate-900 antialiased;
   }
+
+  /* Consistent focus ring across the app */
+  :focus-visible {
+    @apply outline-none ring-2 ring-sky-500/60 ring-offset-2 ring-offset-slate-50;
+  }
 }
 
 @layer components {
-  .btn-primary {
-    @apply inline-flex items-center justify-center rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brand-500 transition;
-  }
-
-  .btn-outline {
-    @apply inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition;
-  }
-
-  .card {
-    @apply rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-100;
-  }
-
+  /* --------------------------------
+     Layout primitives
+  --------------------------------- */
   .page-shell {
     @apply min-h-screen bg-slate-50;
   }
 
   .page-container {
     @apply mx-auto max-w-6xl px-4 py-6 sm:py-8 lg:py-10;
+  }
+
+  .panel {
+    @apply rounded-3xl border border-slate-200 bg-white p-5 shadow-sm;
+  }
+
+  .panel-muted {
+    @apply rounded-2xl border border-slate-200 bg-slate-50 p-4;
+  }
+
+  .section-title {
+    @apply text-base font-semibold text-slate-900;
+  }
+
+  .section-subtitle {
+    @apply mt-1 text-[11px] text-slate-600;
+  }
+
+  /* --------------------------------
+     Buttons
+  --------------------------------- */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-4 py-2 text-xs font-semibold transition disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .btn-primary {
+    @apply btn bg-sky-600 text-white shadow-sm shadow-sky-500/25 hover:bg-sky-700;
+  }
+
+  .btn-dark {
+    @apply btn bg-slate-900 text-white hover:bg-slate-800;
+  }
+
+  .btn-outline {
+    @apply btn border border-slate-200 bg-white text-slate-700 hover:bg-slate-50;
+  }
+
+  .btn-ghost {
+    @apply btn bg-transparent text-slate-700 hover:bg-slate-100;
+  }
+
+  .btn-danger {
+    @apply btn border border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100;
+  }
+
+  .btn-link {
+    @apply inline-flex items-center gap-1 text-[11px] font-semibold text-sky-700 hover:text-sky-800;
+  }
+
+  /* --------------------------------
+     Inputs
+  --------------------------------- */
+  .input {
+    @apply h-10 w-full rounded-2xl border border-slate-200 bg-white px-3 text-sm text-slate-900 shadow-sm placeholder:text-slate-400 focus:border-sky-500 focus:ring-1 focus:ring-sky-500;
+  }
+
+  .input-sm {
+    @apply h-9 rounded-xl text-[11px];
+  }
+
+  .textarea {
+    @apply w-full resize-none rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm placeholder:text-slate-400 focus:border-sky-500 focus:ring-1 focus:ring-sky-500;
+  }
+
+  .select {
+    @apply h-10 w-full appearance-none rounded-2xl border border-slate-200 bg-slate-50 px-3 text-sm text-slate-700 outline-none transition focus:border-sky-400 focus:bg-white focus:ring-2 focus:ring-sky-100;
+  }
+
+  /* --------------------------------
+     Badges / pills
+  --------------------------------- */
+  .pill {
+    @apply inline-flex items-center gap-1 rounded-full px-2 py-1 text-[11px] font-semibold ring-1;
+  }
+
+  .pill-neutral {
+    @apply pill bg-slate-50 text-slate-700 ring-slate-100;
+  }
+
+  .pill-success {
+    @apply pill bg-emerald-50 text-emerald-800 ring-emerald-100;
+  }
+
+  .pill-warn {
+    @apply pill bg-amber-50 text-amber-900 ring-amber-100;
+  }
+
+  .pill-info {
+    @apply pill bg-sky-50 text-sky-800 ring-sky-100;
+  }
+
+  /* --------------------------------
+     Skeletons
+  --------------------------------- */
+  .skeleton {
+    @apply animate-pulse rounded bg-slate-200;
+  }
+
+  /* --------------------------------
+     Scrollbars (subtle)
+  --------------------------------- */
+  .soft-scroll {
+    scrollbar-width: thin;
+  }
+  .soft-scroll::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  .soft-scroll::-webkit-scrollbar-thumb {
+    background: rgba(15, 23, 42, 0.12);
+    border-radius: 999px;
+    border: 3px solid transparent;
+    background-clip: padding-box;
+  }
+  .soft-scroll::-webkit-scrollbar-thumb:hover {
+    background: rgba(15, 23, 42, 0.18);
+    border: 3px solid transparent;
+    background-clip: padding-box;
   }
 }

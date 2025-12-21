@@ -1,11 +1,13 @@
 <!-- src/views/ThreadView.vue -->
 <template>
   <main class="mx-auto max-w-3xl px-4 pb-28 pt-4">
-    <section v-if="blocked" class="rounded-3xl border border-amber-200 bg-amber-50 p-5 shadow-sm">
+    <section v-if="blocked" class="panel border-amber-200 bg-amber-50">
       <h2 class="text-sm font-bold text-amber-900">Verification required</h2>
-      <p class="mt-1 text-[11px] text-amber-800">Your account must be verified before you can view or reply to patient messages.</p>
+      <p class="mt-1 text-[11px] text-amber-800">
+        Your account must be verified before you can view or reply to patient messages.
+      </p>
       <div class="mt-3">
-        <RouterLink to="/profile" class="inline-flex items-center gap-2 rounded-full bg-amber-600 px-4 py-2 text-xs font-semibold text-white hover:bg-amber-700">Open Profile</RouterLink>
+        <RouterLink to="/profile" class="btn bg-amber-600 text-white hover:bg-amber-700">Open Profile</RouterLink>
       </div>
     </section>
 
@@ -13,21 +15,30 @@
       <header class="flex items-center justify-between gap-3 border-b border-slate-100 p-4">
         <div class="min-w-0">
           <p class="text-[10px] font-medium uppercase tracking-wide text-slate-500">Thread</p>
-          <h1 class="truncate text-base font-semibold text-slate-900">
-            {{ headerTitle || "Conversation" }}
-          </h1>
+          <h1 class="truncate text-base font-semibold text-slate-900">{{ headerTitle || "Conversation" }}</h1>
+          <p class="mt-0.5 text-[11px] text-slate-500">Replying as: <span class="font-semibold text-slate-700">{{ me?.fullName || me?.email || 'Account' }}</span></p>
         </div>
 
-        <RouterLink
-          to="/inbox"
-          class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-2 text-[11px] font-semibold text-slate-700 hover:bg-slate-50"
-        >
-          ← Inbox
-        </RouterLink>
+        <RouterLink to="/inbox" class="btn-outline">← Inbox</RouterLink>
       </header>
 
-      <div ref="scroller" class="h-[calc(100vh-260px)] overflow-y-auto bg-slate-50 p-4">
-        <div v-if="loading" class="text-[11px] text-slate-500">Loading…</div>
+      <div ref="scroller" class="soft-scroll h-[calc(100dvh-270px)] md:h-[calc(100vh-260px)] overflow-y-auto bg-slate-50 p-4">
+        <div v-if="loading" class="space-y-3">
+          <div class="flex justify-start">
+            <div class="max-w-[85%] rounded-2xl border border-slate-200 bg-white px-3 py-3">
+              <div class="skeleton h-3 w-48" />
+              <div class="mt-2 skeleton h-3 w-64" />
+              <div class="mt-2 skeleton h-3 w-24" />
+            </div>
+          </div>
+          <div class="flex justify-end">
+            <div class="max-w-[70%] rounded-2xl bg-sky-600/10 px-3 py-3">
+              <div class="skeleton h-3 w-40" />
+              <div class="mt-2 skeleton h-3 w-56" />
+              <div class="mt-2 skeleton h-3 w-20" />
+            </div>
+          </div>
+        </div>
 
         <div v-else class="space-y-3">
           <div
@@ -38,14 +49,20 @@
           >
             <div
               class="max-w-[85%] rounded-2xl px-3 py-2 text-[11px] leading-relaxed shadow-sm"
-              :class="m.senderUserId === me?.id ? 'bg-sky-600 text-white' : 'bg-white text-slate-800 border border-slate-200'"
+              :class="
+                m.senderUserId === me?.id
+                  ? 'bg-sky-600 text-white shadow-sky-500/15'
+                  : 'bg-white text-slate-800 border border-slate-200'
+              "
             >
               <p class="whitespace-pre-wrap">{{ m.body }}</p>
-              <p class="mt-1 text-[10px] opacity-75">{{ formatWhen(m.createdAt) }}</p>
+              <p class="mt-1 text-[10px] opacity-80">{{ formatWhen(m.createdAt) }}</p>
             </div>
           </div>
 
-          <div v-if="!messages.length" class="text-[11px] text-slate-500">No messages yet. Say hi 👋</div>
+          <div v-if="!messages.length" class="rounded-2xl border border-dashed border-slate-300 bg-white p-4 text-[11px] text-slate-600">
+            No messages yet. Say hi 👋
+          </div>
         </div>
       </div>
 
@@ -54,19 +71,15 @@
           <textarea
             v-model="draft"
             rows="1"
-            class="min-h-[42px] flex-1 resize-none rounded-2xl border border-slate-200 bg-white px-3 py-2 text-[11px] text-slate-800 shadow-sm focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+            class="textarea min-h-[42px] flex-1 text-[11px]"
             placeholder="Type a message…"
           />
-          <button
-            type="submit"
-            :disabled="sending || !draft.trim()"
-            class="inline-flex h-[42px] items-center justify-center rounded-2xl bg-sky-600 px-4 text-xs font-semibold text-white shadow-sm shadow-sky-500/25 hover:bg-sky-700 disabled:cursor-not-allowed disabled:opacity-60"
-          >
+          <button type="submit" :disabled="sending || !draft.trim()" class="btn-primary h-[42px] rounded-2xl px-4">
             <span v-if="!sending">Send</span>
             <span v-else>…</span>
           </button>
         </div>
-        <p v-if="error" class="mt-2 text-[11px] text-red-600">{{ error }}</p>
+        <p v-if="error" class="mt-2 text-[11px] text-rose-700">{{ error }}</p>
         <p v-if="hint" class="mt-2 text-[11px] text-slate-500">{{ hint }}</p>
       </form>
     </section>
