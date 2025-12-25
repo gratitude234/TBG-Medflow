@@ -1,6 +1,6 @@
 <!-- src/views/InboxView.vue -->
 <template>
-  <main class="page">
+  <main class="mx-auto max-w-6xl px-4 pb-24 pt-4 space-y-6">
     <section v-if="blocked" class="panel border-amber-200 bg-amber-50">
       <h2 class="text-sm font-bold text-amber-900">Verification required</h2>
       <p class="mt-1 text-[11px] text-amber-800">
@@ -14,7 +14,7 @@
     <section v-else class="panel">
       <div class="flex items-start justify-between gap-3">
         <div>
-          <h1 class="h1">Inbox</h1>
+          <h1 class="text-lg font-bold text-slate-900">Inbox</h1>
           <p class="mt-1 text-[11px] text-slate-600">Messages and share notifications.</p>
         </div>
         <div class="flex items-center gap-2">

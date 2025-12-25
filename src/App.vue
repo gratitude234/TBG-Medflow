@@ -1,61 +1,63 @@
 <template>
-  <div class="page-shell">
-    <a
-      href="#main-content"
-      class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-slate-900 focus:shadow"
-    >
-      Skip to content
-    </a>
-
+  <div class="min-h-screen bg-slate-50 text-slate-900">
     <!-- Header -->
-    <header class="app-header" :class="{ 'shadow-sm': isScrolled }">
-      <div class="header-inner">
-        <RouterLink to="/" class="flex items-center gap-2" aria-label="Medflow home">
-          <img :src="logoMark" alt="" class="h-8 w-8" />
+    <header
+      class="sticky top-0 z-40 border-b border-slate-200 bg-white/80 backdrop-blur"
+      :class="{ 'shadow-sm': isScrolled }"
+    >
+      <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
+        <RouterLink to="/" class="flex items-center gap-2">
+          <img :src="logoMark" alt="TBG Medflow" class="h-8 w-8" />
           <img :src="logoFull" alt="TBG Medflow" class="hidden h-6 sm:block" />
         </RouterLink>
 
         <!-- Desktop nav -->
-        <nav class="hidden items-center gap-1 sm:flex" aria-label="Primary">
+        <nav class="hidden items-center gap-2 sm:flex" aria-label="Primary">
           <RouterLink
             v-for="link in navLinks"
             :key="link.to"
             :to="link.to"
-            class="nav-link"
-            :class="isActive(link.to) ? 'nav-link-active' : 'nav-link-idle'"
-            :aria-current="isActive(link.to) ? 'page' : undefined"
+            class="rounded-full px-3 py-1.5 text-xs font-semibold transition"
+            :class="isActive(link.to) ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-100'"
           >
             {{ link.label }}
           </RouterLink>
 
           <div v-if="sessionUser" class="ml-2 flex items-center gap-2">
-            <span class="nav-pill max-w-[220px] truncate">
-              {{ sessionUser.fullName || 'Account' }}
+            <span class="rounded-full bg-slate-100 px-3 py-1.5 text-[11px] font-semibold text-slate-700">
+              {{ sessionUser.fullName || "Account" }}
             </span>
-            <button type="button" class="btn-outline btn-sm" @click="logout">Log out</button>
+            <button
+              type="button"
+              class="rounded-full bg-rose-50 px-3 py-1.5 text-[11px] font-semibold text-rose-700 hover:bg-rose-100"
+              @click="logout"
+            >
+              Log out
+            </button>
           </div>
 
           <div v-else class="ml-2 flex items-center gap-2">
-            <RouterLink to="/login" class="btn-ghost btn-sm">Log in</RouterLink>
-            <RouterLink to="/register" class="btn-primary btn-sm">Get started</RouterLink>
+            <RouterLink
+              to="/login"
+              class="rounded-full px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-100"
+            >
+              Log in
+            </RouterLink>
+            <RouterLink
+              to="/register"
+              class="rounded-full bg-sky-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm shadow-sky-500/25 hover:bg-sky-700"
+            >
+              Get started
+            </RouterLink>
           </div>
         </nav>
 
         <!-- Mobile menu button -->
         <button
-          type="button"
-          class="btn-ghost btn-icon sm:hidden"
-          aria-label="Toggle menu"
-          :aria-expanded="mobileNavOpen ? 'true' : 'false'"
-          aria-controls="mobile-menu"
+          class="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 shadow-sm hover:bg-slate-50 sm:hidden"
           @click="mobileNavOpen = !mobileNavOpen"
         >
-          <svg v-if="!mobileNavOpen" viewBox="0 0 24 24" fill="none" stroke="currentColor" class="h-5 w-5">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
-          <svg v-else viewBox="0 0 24 24" fill="none" stroke="currentColor" class="h-5 w-5">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-          </svg>
+          {{ mobileNavOpen ? "Close" : "Menu" }}
         </button>
       </div>
 
@@ -68,34 +70,47 @@
         leave-from-class="opacity-100 translate-y-0"
         leave-to-class="opacity-0 -translate-y-1"
       >
-        <div v-if="mobileNavOpen" id="mobile-menu" class="sm:hidden">
-          <div class="mx-auto max-w-6xl px-4 pb-4">
-            <div class="panel p-4">
-              <nav class="flex flex-col gap-1" aria-label="Mobile primary">
-                <RouterLink
-                  v-for="link in navLinks"
-                  :key="link.to"
-                  :to="link.to"
-                  class="nav-link"
-                  :class="isActive(link.to) ? 'nav-link-active' : 'nav-link-idle'"
-                  :aria-current="isActive(link.to) ? 'page' : undefined"
-                  @click="closeMobileMenu"
-                >
-                  {{ link.label }}
-                </RouterLink>
-              </nav>
+        <div v-if="mobileNavOpen" class="border-t border-slate-200 bg-white sm:hidden">
+          <div class="mx-auto max-w-6xl space-y-2 px-4 py-3">
+            <RouterLink
+              v-for="link in navLinks"
+              :key="link.to"
+              :to="link.to"
+              class="block rounded-xl px-3 py-2 text-sm font-semibold"
+              :class="isActive(link.to) ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-50'"
+              @click="closeMobileMenu"
+            >
+              {{ link.label }}
+            </RouterLink>
 
-              <div v-if="sessionUser" class="mt-3 flex items-center justify-between gap-2">
-                <span class="nav-pill max-w-[60%] truncate">
-                  {{ sessionUser.fullName || sessionUser.email || 'Account' }}
-                </span>
-                <button type="button" class="btn-outline btn-sm" @click="logout">Log out</button>
-              </div>
+            <div v-if="sessionUser" class="flex items-center justify-between gap-2 pt-2">
+              <span class="text-[11px] font-semibold text-slate-600">
+                Signed in as {{ sessionUser.fullName || sessionUser.email }}
+              </span>
+              <button
+                type="button"
+                class="rounded-full bg-rose-50 px-3 py-1.5 text-[11px] font-semibold text-rose-700 hover:bg-rose-100"
+                @click="logout"
+              >
+                Log out
+              </button>
+            </div>
 
-              <div v-else class="mt-3 grid grid-cols-2 gap-2">
-                <RouterLink to="/login" class="btn-outline btn-sm" @click="closeMobileMenu">Log in</RouterLink>
-                <RouterLink to="/register" class="btn-primary btn-sm" @click="closeMobileMenu">Get started</RouterLink>
-              </div>
+            <div v-else class="flex gap-2 pt-2">
+              <RouterLink
+                to="/login"
+                class="flex-1 rounded-full border border-slate-200 bg-white px-4 py-2 text-center text-xs font-semibold text-slate-700 shadow-sm hover:bg-slate-50"
+                @click="closeMobileMenu"
+              >
+                Log in
+              </RouterLink>
+              <RouterLink
+                to="/register"
+                class="flex-1 rounded-full bg-sky-600 px-4 py-2 text-center text-xs font-semibold text-white shadow-md shadow-sky-500/25 transition hover:bg-sky-700"
+                @click="closeMobileMenu"
+              >
+                Get started
+              </RouterLink>
             </div>
           </div>
         </div>
@@ -103,7 +118,11 @@
     </header>
 
     <!-- Main content -->
-    <main id="main-content" :class="showBottomNav ? 'pb-24' : 'pb-10'">
+    <main
+      id="main-content"
+      class="mx-auto max-w-6xl px-4 pt-6 sm:pt-8 lg:pt-10"
+      :class="showBottomNav ? 'pb-24' : 'pb-10'"
+    >
       <RouterView v-slot="{ Component }">
         <Transition
           mode="out-in"
@@ -119,7 +138,7 @@
       </RouterView>
     </main>
 
-    <!-- Bottom nav (mobile) -->
+    <!-- Patient bottom nav (mobile-first IA) -->
     <BottomNav v-if="showBottomNav" :role="sessionUser?.role || 'patient'" />
   </div>
 </template>
@@ -160,7 +179,7 @@ const navLinks = computed(() => {
     ];
   }
 
-  // Logged-in nav
+  // Logged-in nav (now includes Encounters)
   const links = [
     { label: "Dashboard", to: "/dashboard" },
     { label: "Add Vitals", to: "/add" },
@@ -179,7 +198,7 @@ const navLinks = computed(() => {
 });
 
 const handleScroll = () => {
-  isScrolled.value = window.scrollY > 2;
+  isScrolled.value = window.scrollY > 10;
 };
 
 const closeMobileMenu = () => {
@@ -194,6 +213,7 @@ const isActive = (to) => {
 const logout = () => {
   clearSession();
   closeMobileMenu();
+  // keep UX simple: after logout, go to login
   router.push("/login");
 };
 
@@ -203,7 +223,7 @@ onMounted(() => {
 
   window.addEventListener("scroll", handleScroll, { passive: true });
   window.addEventListener("medflow:session", refreshSession);
-  window.addEventListener("storage", refreshSession);
+  window.addEventListener("storage", refreshSession); // cross-tab sync
 });
 
 onBeforeUnmount(() => {

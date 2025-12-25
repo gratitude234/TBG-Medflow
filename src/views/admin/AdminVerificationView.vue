@@ -1,10 +1,10 @@
 <!-- src/views/admin/AdminVerificationView.vue -->
 <template>
-  <main class="page">
-    <section class="panel">
+  <main class="mx-auto max-w-6xl px-4 pb-10 pt-4 space-y-6">
+    <section class="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
       <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h1 class="h1">Staff verification</h1>
+          <h1 class="text-lg font-bold text-slate-900">Staff verification</h1>
           <p class="mt-1 text-[11px] text-slate-600">
             Review and approve student nurses / clinicians before they can receive shares and reply.
           </p>

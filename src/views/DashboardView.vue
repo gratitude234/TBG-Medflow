@@ -1,10 +1,10 @@
 <!-- src/views/DashboardView.vue -->
 <template>
-  <main class="page">
+  <main class="mx-auto max-w-6xl px-4 pb-10 pt-4 space-y-6 sm:pt-6 lg:pt-8">
     <!-- Top header -->
     <section class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
       <div>
-        <h1 class="h1">Dashboard</h1>
+        <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Dashboard</h1>
         <p class="mt-1 text-[11px] text-slate-600">
           {{ headerSubtitle }}
         </p>
@@ -14,26 +14,26 @@
         <RouterLink
           v-if="role === 'patient'"
           to="/share"
-          class="btn-outline"
+          class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
         >
-          Share
+          🔗 Share
         </RouterLink>
 
         <RouterLink
           v-else
           to="/share"
-          class="btn-dark"
+          class="inline-flex items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-xs font-semibold text-white hover:bg-slate-800"
         >
-          Add a patient
+          ＋ Add a patient
         </RouterLink>
 
         <button
           type="button"
-          class="btn-outline"
+          class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60"
           :disabled="loading"
           @click="refresh"
         >
-          Refresh
+          🔄 Refresh
         </button>
       </div>
     </section>
@@ -47,7 +47,7 @@
       <div class="mt-3">
         <RouterLink
           to="/login"
-          class="btn-dark"
+          class="inline-flex rounded-full bg-slate-900 px-4 py-2 text-xs font-semibold text-white hover:bg-slate-800"
         >
           Log in
         </RouterLink>
@@ -57,7 +57,7 @@
     <!-- Patient dashboard -->
     <template v-else-if="role === 'patient'">
       <section class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div class="panel">
+        <div class="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
           <div class="flex items-center justify-between">
             <h2 class="text-sm font-semibold text-slate-900">Latest vitals</h2>
             <span class="rounded-full bg-slate-100 px-2 py-1 text-[10px] font-semibold text-slate-700">
@@ -70,20 +70,20 @@
           <div class="mt-4 flex flex-wrap gap-2">
             <RouterLink
               to="/add"
-              class="btn-primary"
+              class="inline-flex items-center gap-2 rounded-full bg-sky-600 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-sky-700"
             >
-              Add vitals
+              ＋ Add vitals
             </RouterLink>
             <RouterLink
               to="/records"
-              class="btn-outline"
+              class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
             >
               View records
             </RouterLink>
           </div>
         </div>
 
-        <div class="panel">
+        <div class="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
           <div class="flex items-center justify-between">
             <h2 class="text-sm font-semibold text-slate-900">Latest encounter</h2>
             <span class="rounded-full bg-slate-100 px-2 py-1 text-[10px] font-semibold text-slate-700">
@@ -94,21 +94,21 @@
           <div class="mt-4 flex flex-wrap gap-2">
             <RouterLink
               to="/encounters"
-              class="btn-dark"
+              class="inline-flex items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-xs font-semibold text-white hover:bg-slate-800"
             >
-              View notes
+              📝 View notes
             </RouterLink>
             <RouterLink
               to="/encounters/new"
-              class="btn-outline"
+              class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
             >
-              Add note
+              ＋ Add note (optional)
             </RouterLink>
           </div>
         </div>
       </section>
 
-      <section class="panel">
+      <section class="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
         <h2 class="text-sm font-semibold text-slate-900">Today’s next step</h2>
         <p class="mt-1 text-[11px] text-slate-600">
           If you’re monitoring with a clinician/mentor, generate a share code under <span class="font-semibold">Share &amp; Monitoring</span>.
@@ -116,7 +116,7 @@
         <div class="mt-4">
           <RouterLink
             to="/share"
-            class="btn-dark"
+            class="inline-flex rounded-full bg-slate-900 px-4 py-2 text-xs font-semibold text-white hover:bg-slate-800"
           >
             Open Share &amp; Monitoring
           </RouterLink>
@@ -127,7 +127,7 @@
     <!-- Clinician / student / other -->
     <template v-else>
       <!-- Active patient banner -->
-      <section class="panel">
+      <section class="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
         <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <h2 class="text-sm font-semibold text-slate-900">Active patient</h2>
@@ -139,28 +139,28 @@
           <div class="flex flex-wrap gap-2">
             <RouterLink
               :to="activePatient ? { path: '/records', query: patientQuery(activePatient.id) } : '/share'"
-              class="btn-primary"
+              class="inline-flex items-center gap-2 rounded-full bg-sky-600 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-sky-700"
             >
-              Open vitals
+              🗂️ Open vitals
             </RouterLink>
             <RouterLink
               :to="activePatient ? { path: '/encounters/new', query: patientQuery(activePatient.id) } : '/share'"
-              class="btn-dark"
+              class="inline-flex items-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-xs font-semibold text-white hover:bg-slate-800"
             >
-              New note
+              ＋ New note
             </RouterLink>
             <RouterLink
               :to="activePatient ? { path: '/encounters', query: patientQuery(activePatient.id) } : '/share'"
-              class="btn-outline"
+              class="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50"
             >
-              View notes
+              📝 View notes
             </RouterLink>
           </div>
         </div>
       </section>
 
       <!-- Monitoring list -->
-      <section class="panel">
+      <section class="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
         <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <h2 class="text-sm font-semibold text-slate-900">Monitoring patients</h2>
@@ -174,7 +174,7 @@
               v-model="search"
               type="text"
               placeholder="Search name/email"
-              class="input max-w-xs"
+              class="h-10 w-full max-w-xs rounded-2xl border border-slate-200 bg-white px-3 text-sm outline-none ring-0 placeholder:text-slate-400 focus:border-sky-300"
             />
           </div>
         </div>
@@ -190,7 +190,7 @@
             <div class="mt-3">
               <RouterLink
                 to="/share"
-                class="btn-dark"
+                class="inline-flex rounded-full bg-slate-900 px-4 py-2 text-xs font-semibold text-white hover:bg-slate-800"
               >
                 Open Share &amp; Monitoring
               </RouterLink>

@@ -1,5 +1,5 @@
 <template>
-  <main class="page">
+  <main class="mx-auto max-w-6xl px-4 pb-10 pt-4 space-y-6 sm:pt-6 lg:pt-8">
     <!-- Header -->
     <section class="flex items-start justify-between gap-4">
       <div>
@@ -10,7 +10,7 @@
           ← Back to notes
         </RouterLink>
 
-        <h1 class="mt-3 h1">
+        <h1 class="mt-3 text-2xl font-semibold tracking-tight text-slate-900">
           Add note (SOAP)
         </h1>
         <p class="mt-1 text-[11px] text-slate-600">
@@ -54,7 +54,7 @@
     <!-- Form -->
     <section class="grid gap-6 lg:grid-cols-[minmax(0,1.7fr)_minmax(0,1fr)]">
       <form
-        class="panel space-y-6"
+        class="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm space-y-6"
         @submit.prevent="submit"
       >
         <!-- Visit details -->
@@ -217,7 +217,7 @@
 
       <!-- Preview -->
       <aside class="space-y-4">
-        <section class="panel">
+        <section class="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
           <div class="flex items-center justify-between gap-3">
             <h2 class="text-sm font-semibold text-slate-900">Preview</h2>
             <span class="rounded-full bg-slate-50 px-2.5 py-1 text-[10px] font-medium text-slate-600 ring-1 ring-slate-100">
