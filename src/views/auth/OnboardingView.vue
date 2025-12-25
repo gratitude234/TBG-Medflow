@@ -1,7 +1,7 @@
 <!-- src/views/auth/OnboardingView.vue -->
 <template>
-  <main class="mx-auto max-w-6xl px-4 pb-16 pt-4 space-y-6 sm:pt-6 lg:pt-8">
-    <section class="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+  <main class="page">
+    <section class="panel sm:p-6">
       <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p class="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Setup</p>

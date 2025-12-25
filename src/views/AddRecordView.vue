@@ -1,6 +1,6 @@
 <!-- src/views/AddRecordView.vue -->
 <template>
-  <main class="mx-auto max-w-6xl px-4 pb-10 pt-4 sm:pt-6 lg:pt-8">
+  <main class="page">
     <section class="space-y-6 sm:space-y-8">
       <!-- Page header -->
       <header class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -8,7 +8,7 @@
         <div>
           <RouterLink
             :to="backToDashboard"
-            class="inline-flex items-center gap-2 rounded-full bg-white/80 px-3 py-1.5 text-[11px] font-medium text-slate-600 shadow-sm ring-1 ring-slate-200 transition hover:bg-slate-50 hover:text-slate-900"
+            class="btn-ghost btn-sm"
           >
             <span class="text-sm">←</span>
             <span>Back to dashboard</span>
@@ -16,7 +16,7 @@
 
           <div class="mt-3 space-y-1.5">
             <div class="flex flex-wrap items-center gap-2">
-              <h1 class="text-2xl font-semibold text-slate-900 sm:text-3xl">Add Vitals</h1>
+              <h1 class="h1">Add Vitals</h1>
               <span
                 class="inline-flex items-center gap-1 rounded-full bg-sky-50 px-2.5 py-1 text-[11px] font-medium text-sky-700 ring-1 ring-sky-100"
               >
@@ -25,13 +25,13 @@
               </span>
             </div>
 
-            <p class="text-sm text-slate-600">
+            <p class="muted">
               Log vitals in calm steps. You can leave fields blank if you didn’t measure them.
               <span class="font-medium">At least one vital is required</span>.
             </p>
 
             <!-- Monitoring context (clinician/student) -->
-            <div v-if="context.isViewer" class="mt-3 rounded-2xl border border-slate-200 bg-slate-50 p-3">
+            <div v-if="context.isViewer" class="mt-3 panel-muted">
               <div v-if="context.patientId" class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                 <p class="text-[11px] text-slate-700">
                   You’re logging vitals for
@@ -163,7 +163,7 @@
                   <input
                     v-model="form.date"
                     type="date"
-                    class="mt-1.5 w-full rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-900 outline-none ring-sky-100 placeholder:text-slate-400 focus:border-sky-400 focus:bg-white focus:ring-2"
+                    class="mt-1.5 input input-sm"
                   />
                   <p v-if="errors.date" class="mt-1 text-[11px] text-rose-600">{{ errors.date }}</p>
                 </div>
@@ -174,7 +174,7 @@
                   <input
                     v-model="form.time"
                     type="time"
-                    class="mt-1.5 w-full rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-900 outline-none ring-sky-100 placeholder:text-slate-400 focus:border-sky-400 focus:bg-white focus:ring-2"
+                    class="mt-1.5 input input-sm"
                   />
                 </div>
               </div>
@@ -184,7 +184,7 @@
                 <label class="text-xs font-medium text-slate-700">Session</label>
                 <select
                   v-model="form.session"
-                  class="mt-1.5 w-full rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-900 outline-none ring-sky-100 focus:border-sky-400 focus:bg-white focus:ring-2"
+                  class="mt-1.5 input input-sm"
                 >
                   <option value="">Select session (optional)</option>
                   <option value="Morning">Morning</option>
@@ -222,7 +222,7 @@
                       type="number"
                       inputmode="decimal"
                       placeholder="118"
-                      class="mt-1 w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-900 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-100"
+                      class="mt-1 input input-sm"
                     />
                   </div>
                   <div>
@@ -232,7 +232,7 @@
                       type="number"
                       inputmode="decimal"
                       placeholder="76"
-                      class="mt-1 w-full rounded-2xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-900 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-100"
+                      class="mt-1 input input-sm"
                     />
                   </div>
                 </div>
@@ -251,7 +251,7 @@
                       type="number"
                       inputmode="decimal"
                       placeholder="78"
-                      class="mt-1.5 w-full rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-900 outline-none focus:border-sky-400 focus:bg-white focus:ring-2 focus:ring-sky-100"
+                      class="mt-1.5 input input-sm"
                     />
                   </div>
 
@@ -266,7 +266,7 @@
                       inputmode="decimal"
                       placeholder="36.8"
                       step="0.1"
-                      class="mt-1.5 w-full rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-900 outline-none focus:border-sky-400 focus:bg-white focus:ring-2 focus:ring-sky-100"
+                      class="mt-1.5 input input-sm"
                     />
                   </div>
                 </div>
@@ -281,7 +281,7 @@
                     type="number"
                     inputmode="decimal"
                     placeholder="95"
-                    class="mt-1.5 w-full rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-900 outline-none focus:border-sky-400 focus:bg-white focus:ring-2 focus:ring-sky-100"
+                    class="mt-1.5 input input-sm"
                   />
                 </div>
               </div>
@@ -302,7 +302,7 @@
                   v-model="form.symptoms"
                   rows="3"
                   placeholder="E.g. mild headache, felt dizzy standing up, no symptoms…"
-                  class="mt-1.5 w-full rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-900 outline-none ring-sky-100 placeholder:text-slate-400 focus:border-sky-400 focus:bg-white focus:ring-2"
+                  class="mt-1.5 input input-sm"
                 ></textarea>
               </div>
 
@@ -314,7 +314,7 @@
                   v-model="form.notes"
                   rows="3"
                   placeholder="Anything else you want to remember about this reading."
-                  class="mt-1.5 w-full rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-900 outline-none ring-sky-100 placeholder:text-slate-400 focus:border-sky-400 focus:bg-white focus:ring-2"
+                  class="mt-1.5 input input-sm"
                 ></textarea>
               </div>
             </section>
@@ -375,7 +375,7 @@
                 <button
                   type="submit"
                   :disabled="saving || !canActOnPatient"
-                  class="inline-flex items-center justify-center gap-2 rounded-full bg-sky-600 px-5 py-2 text-xs font-semibold text-white shadow-sm shadow-sky-500/30 hover:bg-sky-700 disabled:cursor-not-allowed disabled:opacity-60"
+                  class="btn-primary"
                 >
                   <span v-if="!saving && canActOnPatient">Save vitals</span>
                   <span v-else-if="!saving && !canActOnPatient">Select a patient first</span>

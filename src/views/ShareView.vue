@@ -1,10 +1,10 @@
 <!-- src/views/ShareView.vue -->
 <template>
-  <main class="mx-auto max-w-6xl px-4 pb-10 pt-4 space-y-6 sm:pt-6 lg:pt-8">
+  <main class="page">
     <!-- Header -->
     <section class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
       <div>
-        <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Share &amp; Monitoring</h1>
+        <h1 class="h1">Share &amp; Monitoring</h1>
         <p class="mt-1 text-[11px] text-slate-600">
           Option A: Patients generate a share code. A clinician/student enters the code to monitor the patient.
         </p>
@@ -19,7 +19,7 @@
     </section>
 
     <!-- ✅ Option B: Secure Share (Care Team) -->
-    <section v-if="role === 'patient'" class="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+    <section v-if="role === 'patient'" class="panel">
       <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h2 class="text-base font-bold text-slate-900">Secure share (Verified care team)</h2>
@@ -147,7 +147,7 @@
 
 
     <!-- Not logged in -->
-    <section v-if="!user" class="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+    <section v-if="!user" class="panel">
       <div class="rounded-2xl bg-amber-50 p-4 text-[11px] text-amber-900">
         You’re not logged in. Log in to create a share code or accept one.
         <div class="mt-3">
@@ -163,7 +163,7 @@
 
     <section v-else class="grid gap-6 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
       <!-- Left: Patient generates code OR Clinician/Student accepts code -->
-      <section class="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+      <section class="panel">
         <div class="flex items-start justify-between gap-3">
           <div>
             <h2 class="text-sm font-semibold text-slate-900">
@@ -218,7 +218,7 @@
           <div class="flex flex-wrap items-center gap-2">
             <button
               type="button"
-              class="inline-flex items-center gap-2 rounded-full bg-sky-600 px-4 py-2 text-xs font-semibold text-white shadow-sm shadow-sky-500/20 hover:bg-sky-700 disabled:opacity-60"
+              class="btn-primary"
               :disabled="busy"
               @click="handleCreateInvite"
             >
@@ -282,7 +282,7 @@
           <div class="flex flex-wrap items-center gap-2">
             <button
               type="button"
-              class="inline-flex items-center gap-2 rounded-full bg-sky-600 px-4 py-2 text-xs font-semibold text-white shadow-sm shadow-sky-500/20 hover:bg-sky-700 disabled:opacity-60"
+              class="btn-primary"
               :disabled="busy || !accept.code.trim() || acceptBlocked"
               @click="handleAcceptInvite"
             >
@@ -314,7 +314,7 @@
 
       <!-- Right: Monitoring list (clinician/student), or guidance (patient) -->
       <aside class="space-y-4">
-        <section class="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+        <section class="panel">
           <div class="flex items-center justify-between gap-3">
             <h2 class="text-sm font-semibold text-slate-900">
               {{ role === 'patient' ? 'How monitoring works' : 'My monitoring patients' }}

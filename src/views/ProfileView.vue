@@ -1,10 +1,10 @@
 <!-- src/views/ProfileView.vue -->
 <template>
-  <main class="mx-auto max-w-6xl px-4 pb-10 pt-4 space-y-6">
-    <section class="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+  <main class="page">
+    <section class="panel">
       <div class="flex items-start justify-between gap-3">
         <div>
-          <h1 class="text-lg font-bold text-slate-900">Profile</h1>
+          <h1 class="h1">Profile</h1>
           <p class="mt-1 text-[11px] text-slate-600">Account, role, onboarding, and quick actions.</p>
         </div>
 

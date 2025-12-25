@@ -4,11 +4,11 @@
     class="mx-auto flex min-h-[calc(100vh-72px)] max-w-6xl items-center justify-center px-4 pb-10 pt-4 sm:pt-6 lg:pt-10"
   >
     <section
-      class="grid w-full max-w-4xl gap-6 rounded-3xl bg-white/85 p-4 shadow-lg shadow-slate-200/70 ring-1 ring-slate-100/80 backdrop-blur-sm sm:p-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,1.1fr)] lg:p-8"
+      class="auth-card"
     >
       <!-- Left: brand / story -->
       <section
-        class="flex flex-col justify-between border-b border-slate-100 pb-4 lg:border-b-0 lg:border-r lg:pb-0 lg:pr-6"
+        class="auth-aside"
       >
         <div>
           <RouterLink
@@ -73,8 +73,8 @@
       </section>
 
       <!-- Right: register form -->
-      <section class="pt-2 lg:pt-0">
-        <div class="rounded-2xl bg-slate-50/90 p-4 shadow-inner ring-1 ring-slate-100 sm:p-5 lg:p-6">
+      <section class="auth-main">
+        <div class="auth-form">
           <!-- Toast -->
           <div
             v-if="toast.visible"
@@ -110,7 +110,7 @@
                   v-model="form.fullName"
                   type="text"
                   autocomplete="name"
-                  class="mt-0.5 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-[11px] text-slate-800 shadow-sm placeholder:text-slate-400 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+                  class="input"
                   placeholder="E.g. Adeola B. Thomas"
                 />
                 <p v-if="errors.fullName" class="mt-1 text-[10px] text-red-500">{{ errors.fullName }}</p>
@@ -140,7 +140,7 @@
                 v-model="form.email"
                 type="email"
                 autocomplete="email"
-                class="mt-0.5 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-[11px] text-slate-800 shadow-sm placeholder:text-slate-400 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500"
+                class="input"
                 placeholder="you@example.com"
               />
               <p v-if="errors.email" class="mt-1 text-[10px] text-red-500">{{ errors.email }}</p>
@@ -151,7 +151,7 @@
                 Password <span class="text-red-500">*</span>
               </label>
               <div
-                class="mt-0.5 flex items-center rounded-xl border border-slate-200 bg-white px-3 shadow-sm focus-within:border-sky-500 focus-within:ring-1 focus-within:ring-sky-500"
+                class="input-group"
               >
                 <input
                   id="password"
@@ -230,7 +230,7 @@
             <button
               type="submit"
               :disabled="isSubmitting"
-              class="mt-1 inline-flex w-full items-center justify-center gap-2 rounded-full bg-sky-600 px-4 py-2 text-xs font-semibold text-white shadow-sm shadow-sky-500/30 hover:bg-sky-700 disabled:cursor-not-allowed disabled:opacity-60"
+              class="btn-primary w-full"
             >
               <span v-if="!isSubmitting">Create account</span>
               <span v-else>Creating your workspace…</span>

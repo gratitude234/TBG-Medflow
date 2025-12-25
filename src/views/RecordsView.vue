@@ -1,6 +1,6 @@
 <!-- src/views/RecordsView.vue -->
 <template>
-  <main class="mx-auto max-w-6xl px-4 pb-10 pt-4 space-y-6 sm:space-y-8 sm:pt-6 lg:pt-8">
+  <main class="page">
     <!-- Toast -->
     <div
       v-if="toast.visible"
@@ -28,7 +28,7 @@
 
         <div class="mt-3 space-y-1">
           <div class="flex items-center gap-2">
-            <h1 class="text-2xl font-semibold text-slate-900 sm:text-2xl">{{ pageTitle }}</h1>
+            <h1 class="h1">{{ pageTitle }}</h1>
             <span
               class="inline-flex items-center gap-1 rounded-full bg-sky-50 px-2.5 py-1 text-[11px] font-medium text-sky-700 ring-1 ring-sky-100"
             >

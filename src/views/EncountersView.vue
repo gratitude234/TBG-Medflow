@@ -1,8 +1,8 @@
 <template>
-  <main class="mx-auto max-w-6xl px-4 pb-10 pt-4 space-y-6 sm:pt-6 lg:pt-8">
+  <main class="page">
     <section class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
       <div>
-        <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Notes</h1>
+        <h1 class="h1">Notes</h1>
         <p class="mt-1 text-[11px] text-slate-600">
           Optional notes (SOAP) for documentation and review.
         </p>
@@ -18,7 +18,7 @@
       <div class="flex flex-wrap gap-2">
         <RouterLink
           :to="toNewEncounter"
-          class="inline-flex items-center gap-2 rounded-full bg-sky-600 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-sky-700"
+          class="btn-primary"
         >
           ＋ Add note
         </RouterLink>
@@ -36,7 +36,7 @@
 
     <section class="grid gap-6 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
       <!-- List -->
-      <section class="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+      <section class="panel">
         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div class="flex gap-2">
             <input
@@ -106,7 +106,7 @@
 
       <!-- Detail -->
       <aside class="space-y-4">
-        <section class="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+        <section class="panel">
           <h2 class="text-sm font-semibold text-slate-900">Preview</h2>
 
           <div v-if="!selected" class="mt-3 text-[11px] text-slate-600">

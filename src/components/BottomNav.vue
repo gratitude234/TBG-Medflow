@@ -1,43 +1,73 @@
 <!-- src/components/BottomNav.vue -->
 <template>
-  <nav
-    class="fixed bottom-0 left-0 right-0 z-50 border-t border-slate-200 bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/70"
-    aria-label="Bottom navigation"
-  >
-    <div class="mx-auto flex max-w-6xl items-center justify-between px-3 py-2">
-      <RouterLink :to="links.dashboard" class="nav-item" :class="{ active: isActive('/dashboard') }">
-        <span class="icon">🏠</span>
-        <span class="label">{{ dashboardLabel }}</span>
-      </RouterLink>
-
-      <RouterLink :to="links.records" class="nav-item" :class="{ active: isActive('/records') }">
-        <span class="icon">{{ recordsIcon }}</span>
-        <span class="label">{{ recordsLabel }}</span>
-      </RouterLink>
-
-      <!-- Center action (role-based) -->
+  <nav class="bottom-nav sm:hidden" aria-label="Bottom navigation">
+    <div class="bottom-nav-inner">
       <RouterLink
-        :to="center.to"
-        class="mx-1 inline-flex h-11 w-11 items-center justify-center rounded-full bg-sky-600 text-white shadow-md shadow-sky-500/25 active:scale-[0.98]"
-        :aria-label="center.aria"
-        :title="center.aria"
+        :to="links.dashboard"
+        class="bottom-nav-item"
+        :class="{ active: isActive('/dashboard') }"
+        :aria-current="isActive('/dashboard') ? 'page' : undefined"
       >
-        <span class="text-xl leading-none">＋</span>
+        <svg class="bottom-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 11l9-7 9 7v10a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2V14H11v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V11z" />
+        </svg>
+        <span>{{ dashboardLabel }}</span>
       </RouterLink>
 
-      <RouterLink :to="links.encounters" class="nav-item" :class="{ active: isActive('/encounters') }">
-        <span class="icon">📝</span>
-        <span class="label">Notes</span>
+      <RouterLink
+        :to="links.records"
+        class="bottom-nav-item"
+        :class="{ active: isActive('/records') }"
+        :aria-current="isActive('/records') ? 'page' : undefined"
+      >
+        <svg class="bottom-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" />
+        </svg>
+        <span>{{ recordsLabel }}</span>
       </RouterLink>
 
+      <div class="bottom-nav-fab" aria-hidden="false">
+        <RouterLink :to="center.to" class="bottom-nav-fab-btn" :aria-label="center.aria" :title="center.aria">
+          <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v14M5 12h14" />
+          </svg>
+        </RouterLink>
+      </div>
 
-      <RouterLink :to="links.inbox" class="nav-item" :class="{ active: isActive('/inbox') }">
-        <span class="icon">💬</span>
-        <span class="label">Inbox</span>
+      <RouterLink
+        :to="links.encounters"
+        class="bottom-nav-item"
+        :class="{ active: isActive('/encounters') }"
+        :aria-current="isActive('/encounters') ? 'page' : undefined"
+      >
+        <svg class="bottom-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 6H7a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h7l5 5v13a2 2 0 0 1-2 2z" />
+        </svg>
+        <span>Notes</span>
       </RouterLink>
-      <RouterLink :to="links.profile" class="nav-item" :class="{ active: isActive('/profile') }">
-        <span class="icon">👤</span>
-        <span class="label">Profile</span>
+
+      <RouterLink
+        :to="links.inbox"
+        class="bottom-nav-item"
+        :class="{ active: isActive('/inbox') }"
+        :aria-current="isActive('/inbox') ? 'page' : undefined"
+      >
+        <svg class="bottom-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 15a4 4 0 0 1-4 4H7l-4 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v8z" />
+        </svg>
+        <span>Inbox</span>
+      </RouterLink>
+
+      <RouterLink
+        :to="links.profile"
+        class="bottom-nav-item"
+        :class="{ active: isActive('/profile') }"
+        :aria-current="isActive('/profile') ? 'page' : undefined"
+      >
+        <svg class="bottom-nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 21a8 8 0 0 0-16 0M12 11a4 4 0 1 0-4-4 4 4 0 0 0 4 4z" />
+        </svg>
+        <span>Profile</span>
       </RouterLink>
     </div>
   </nav>
@@ -93,7 +123,7 @@ const center = computed(() => {
   // Patient: add vitals
   if (role.value === "patient") return { to: "/add", aria: "Add vitals" };
 
-  // Student/clinician: add encounter for selected patient (or route to Share to pick)
+  // Student/clinician: add encounter for selected patient (or route to dashboard)
   if (role.value === "student" || role.value === "clinician") {
     if (activePatientId.value > 0) {
       return { to: { path: "/encounters/new", query: patientQuery(activePatientId.value) }, aria: "Add note" };
@@ -107,35 +137,6 @@ const center = computed(() => {
 
 const dashboardLabel = computed(() => (isViewer.value ? "Patients" : "Dashboard"));
 const recordsLabel = computed(() => (isViewer.value ? "Vitals" : "Records"));
-const recordsIcon = computed(() => (isViewer.value ? "🩺" : "🗂️"));
 
 const isActive = (prefix) => route.path === prefix || route.path.startsWith(prefix + "/");
 </script>
-
-<style scoped>
-.nav-item {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  padding: 6px 8px;
-  border-radius: 12px;
-  color: #334155; /* slate-700 */
-  min-width: 64px;
-}
-.nav-item:hover {
-  background: rgba(15, 23, 42, 0.04);
-}
-.nav-item.active {
-  color: #0369a1; /* sky-700 */
-  background: rgba(2, 132, 199, 0.08);
-}
-.icon {
-  font-size: 16px;
-  line-height: 1;
-}
-.label {
-  font-size: 10px;
-  font-weight: 600;
-}
-</style>
