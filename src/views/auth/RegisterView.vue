@@ -367,7 +367,7 @@ const handleSubmit = async () => {
       if (!user.fullName && form.fullName) user.fullName = form.fullName;
 
       setSessionUser(user);
-      if (data.token) setSessionToken(data.token);
+      if (data.token) setSessionToken(data.token, data.expiresAt);
 
       // If we showed warning, don't immediately overwrite; otherwise success toast
       if (toast.type !== "warn") showToast("success", "Account created. Let’s set up your workspace…");

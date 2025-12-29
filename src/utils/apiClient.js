@@ -1,14 +1,20 @@
 // src/utils/apiClient.js
 
+import { clearSession, isTokenExpired } from "./session";
 const RAW_BASE =
   import.meta.env.VITE_API_BASE ||
-  "https://jabumarket.com.ng/HealthTrack_api/";
+  `${window.location.origin}/HealthTrack_api/`;
 
 // Ensure trailing slash
 const API_BASE = RAW_BASE.endsWith("/") ? RAW_BASE : RAW_BASE + "/";
 
+
 function getToken() {
   try {
+    if (isTokenExpired()) {
+      clearSession();
+      return "";
+    }
     return localStorage.getItem("medflowToken") || "";
   } catch {
     return "";
@@ -50,6 +56,10 @@ async function request(path, options = {}) {
 
   // HTTP-level failure
   if (!res.ok) {
+    // If token is invalid/expired, clear local session so router guard can redirect to login.
+    if (res.status === 401) {
+      try { clearSession(); } catch {}
+    }
     const msg = data?.error || `Request failed (${res.status})`;
     throw new Error(msg);
   }

@@ -297,7 +297,7 @@ const handleSubmit = async () => {
     }
 
     setSessionUser(user);
-    if (data.token) setSessionToken(data.token);
+    if (data.token) setSessionToken(data.token, data.expiresAt);
 
     // Save UI hint (optional; UI-only preference)
     try {

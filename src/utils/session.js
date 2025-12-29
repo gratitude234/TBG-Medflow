@@ -2,7 +2,8 @@
 // Single source of truth for auth/session storage
 
 const USER_KEY = "medflowUser";
-const TOKEN_KEY = "medflowToken"; // optional (your backend currently returns a demo token)
+const TOKEN_KEY = "medflowToken";
+const TOKEN_EXPIRES_KEY = "medflowTokenExpiresAt"; // ISO string from backend (expiresAt)
 
 /**
  * Emit a global event so App/Header/Nav can react immediately
@@ -39,14 +40,35 @@ export function setSessionUser(user) {
   }
 }
 
-export function setSessionToken(token) {
+export function setSessionToken(token, expiresAt) {
   try {
-    if (!token) return;
-    localStorage.setItem(TOKEN_KEY, String(token));
+    localStorage.setItem(TOKEN_KEY, String(token || ""));
+    if (expiresAt) {
+      localStorage.setItem(TOKEN_EXPIRES_KEY, String(expiresAt));
+    } else {
+      localStorage.removeItem(TOKEN_EXPIRES_KEY);
+    }
     emitSessionChange("token");
   } catch {
     // ignore
   }
+}
+
+export function getTokenExpiresAt() {
+  try {
+    const v = localStorage.getItem(TOKEN_EXPIRES_KEY);
+    return v ? String(v) : "";
+  } catch {
+    return "";
+  }
+}
+
+export function isTokenExpired() {
+  const exp = getTokenExpiresAt();
+  if (!exp) return false;
+  const t = Date.parse(exp);
+  if (Number.isNaN(t)) return false;
+  return Date.now() > t;
 }
 
 export function getSessionToken() {
@@ -61,6 +83,7 @@ export function clearSession() {
   try {
     localStorage.removeItem(USER_KEY);
     localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(TOKEN_EXPIRES_KEY);
     emitSessionChange("logout");
   } catch {
     // ignore
